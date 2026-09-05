@@ -113,6 +113,8 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .btn:active{transform:scale(.98)}
 .btn.secondary{background:var(--overlay-fill);color:var(--text);border:1px solid var(--overlay-border);box-shadow:none}
 .btn.secondary:hover{background:var(--overlay-fill-hover);border-color:var(--accent-soft-2)}
+.btn.danger{background:var(--danger);box-shadow:0 8px 20px -8px rgba(255,90,90,.5)}
+.btn:disabled{opacity:.5;cursor:default;pointer-events:none}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--border);box-shadow:none}
 .btn.ghost:hover{color:var(--text);border-color:var(--accent-soft-2)}
 .btn.ghost-light{background:rgba(255,255,255,.14);color:#fff;box-shadow:none}
@@ -132,6 +134,9 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .filter-panel.open{display:block}
 .filter-row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
 .field{display:flex;flex-direction:column;gap:6px;min-width:160px;flex:1}
+.list-rule-row{display:flex;gap:10px;align-items:flex-end;margin-bottom:10px}
+.list-rule-remove{flex-shrink:0}
+.list-rule-preview{margin-top:12px;font:600 12.5px var(--font-body);color:var(--accent);background:var(--accent-soft);border-radius:var(--r-s);padding:9px 13px;display:inline-block}
 .field span,.field>label,label.field span{font-size:12px;font-weight:600;color:var(--muted)}
 .input,.select,.textarea,.filter-input,.sort-select,.rows-select{border:1px solid var(--border);border-radius:var(--r-s);background:var(--surface-2);color:var(--text);font:400 13.5px/1.4 var(--font-body);padding:9px 12px}
 .input:focus,.select:focus,.textarea:focus,.filter-input:focus,.sort-select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
@@ -154,6 +159,10 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .action-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
 .action-btn:not(:disabled):hover{background:var(--surface-2);color:var(--text)}
 .action-btn:disabled{cursor:not-allowed;opacity:.35}
+.bulk-col{display:none;width:34px}
+.data-table.bulk-active .bulk-col{display:table-cell}
+.bulk-col input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.bulk-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent-soft-2);border-radius:var(--r-m);padding:10px 16px;margin-bottom:12px;font:600 13px var(--font-body);color:var(--accent)}
 .table-wrap{position:relative;width:100%;overflow:auto;border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface)}
 .data-table{width:100%;border-collapse:collapse}
 .data-table thead{background:transparent}
@@ -225,6 +234,26 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .cpf-col li.no{color:var(--faint)}
 .cpf-col li.no::before{content:'';width:14px;height:14px;flex-shrink:0}
 @media(max-width:640px){.current-plan-head{flex-direction:column}.current-plan-head .header-actions{width:100%}}
+.channel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:16px}
+.channel-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:16px}
+.channel-icon{width:38px;height:38px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.channel-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+.channel-icon.messenger{background:#0084ff}
+.channel-icon.instagram{background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4)}
+.channel-icon.telegram{background:#26a5e4}
+.channel-icon.zoho{background:#e42527}
+.channel-icon.hubspot{background:#ff7a59}
+.channel-copy{display:flex;flex-direction:column;gap:2px}
+.channel-copy strong{font:700 13.5px var(--font-display);color:var(--text)}
+.channel-copy span{font:400 12px var(--font-body);color:var(--faint)}
+.channel-card .btn{width:100%}
+.payment-methods-list{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.payment-method-row{display:flex;align-items:center;gap:14px;border:1px solid var(--border);border-radius:var(--r-m);padding:14px 16px}
+.payment-method-icon{width:38px;height:38px;border-radius:var(--r-s);background:var(--surface-2);color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.payment-method-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+.payment-method-copy{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.payment-method-copy strong{font:700 13.5px var(--font-display);color:var(--text)}
+.payment-method-copy span{font:400 12px var(--font-body);color:var(--faint)}
 .push-card{background:var(--good-soft);color:var(--good);border:1px solid rgba(53,214,138,.28);border-radius:var(--r-s);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .push-card strong{display:inline-flex;align-items:center;gap:8px}
 .push-card svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
@@ -700,7 +729,7 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
           <button type="button" data-theme-set="dark" title="Modo oscuro" aria-label="Modo oscuro"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></button>
         </div>
       </div>
-      <div id="language-menu" class="dropdown-panel"><button>ES Español</button><button>EN English</button></div>
+      <div id="language-menu" class="dropdown-panel"><button type="button" data-set-language="ES">ES Español</button><button type="button" data-set-language="EN">EN English</button></div>
       <nav class="nav" aria-label="Navegación principal"><span class="nav-group-label">Principal</span><a class="nav-link " href="inicio.html" title="Inicio"><span class="nav-icon"><img src="assets/ic-real-estate-stairs-BIHfu12I.svg" alt="Inicio"></span><span>Inicio</span></a><a class="nav-link " href="chat.html" title="Chats"><span class="nav-icon"><img src="assets/ic-contact-message-cUWXr3ZC.svg" alt="Chat en Vivo"></span><span>Chats</span></a><a class="nav-link " href="clientes.html" title="Clientes"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Clientes</span></a><span class="nav-group-label">Ventas</span><a class="nav-link " href="pedidos.html" title="Pedidos"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg></span><span>Pedidos</span></a><a class="nav-link " href="reservas.html" title="Reservas"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span><span>Reservas</span></a><a class="nav-link " href="catalogo.html" title="Catálogo"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m21 16-9 5-9-5V8l9-5 9 5Z"/><path d="m3.3 7.3 8.7 4.9 8.7-4.9"/><path d="M12 22V12"/></svg></span><span>Catálogo</span></a><span class="nav-group-label">Automatización</span><a class="nav-link " href="bots.html" title="Bots"><span class="nav-icon"><img src="assets/ic-actions-emultiple-edit-Dnx9HjSL.svg" alt="Administrar Bots"></span><span>Bots</span></a><a class="nav-link active" href="multimedia.html" title="Multimedia"><span class="nav-icon"><img src="assets/ic-contact-browser-NDtLyHKt.svg" alt="Administrar Medios"></span><span>Multimedia</span></a><a class="nav-link " href="envio-masivo.html" title="Envíos Masivos"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span><span>Envíos Masivos</span></a><span class="nav-group-label">Sistema</span><a class="nav-link " href="configuracion.html" title="Configuración"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.8 1.8 0 0 0 15 19.4a1.8 1.8 0 0 0-1 .6 1.8 1.8 0 0 0-.5 1.3V21a2 2 0 1 1-4 0v-.1a1.8 1.8 0 0 0-1.4-1.76 1.8 1.8 0 0 0-1.98.36l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-.6-1 1.8 1.8 0 0 0-1.3-.5H2.6a2 2 0 1 1 0-4h.1A1.8 1.8 0 0 0 4.46 8.1 1.8 1.8 0 0 0 4.1 6.12l-.06-.06A2 2 0 1 1 6.87 3.23l.06.06A1.8 1.8 0 0 0 9 4.6c.4-.17.73-.4 1-.7.3-.36.5-.8.5-1.3V2.5a2 2 0 1 1 4 0v.1A1.8 1.8 0 0 0 15.9 4.36a1.8 1.8 0 0 0 1.98-.36l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.8 1.8 0 0 0 19.4 9c.17.4.4.73.7 1 .36.3.8.5 1.3.5h.1a2 2 0 1 1 0 4h-.1A1.8 1.8 0 0 0 19.4 15Z"/></svg></span><span>Configuración</span></a></nav>
       <a class="tenant-card" href="inicio.html"><span>Vanity</span><span class="avatar">V</span></a>
       <button class="sidebar-toggle" type="button" data-sidebar-toggle><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
@@ -716,7 +745,7 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
               <button type="button" data-theme-set="dark" title="Modo oscuro" aria-label="Modo oscuro"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></button>
             </div>
           </div>
-          <div id="mobile-language-menu" class="dropdown-panel"><button>ES Español</button><button>EN English</button></div>
+          <div id="mobile-language-menu" class="dropdown-panel"><button type="button" data-set-language="ES">ES Español</button><button type="button" data-set-language="EN">EN English</button></div>
           <nav class="nav mobile-nav" aria-label="Navegación móvil"><span class="nav-group-label">Principal</span><a class="nav-link " href="inicio.html" title="Inicio"><span class="nav-icon"><img src="assets/ic-real-estate-stairs-BIHfu12I.svg" alt="Inicio"></span><span>Inicio</span></a><a class="nav-link " href="chat.html" title="Chats"><span class="nav-icon"><img src="assets/ic-contact-message-cUWXr3ZC.svg" alt="Chat en Vivo"></span><span>Chats</span></a><a class="nav-link " href="clientes.html" title="Clientes"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Clientes</span></a><span class="nav-group-label">Ventas</span><a class="nav-link " href="pedidos.html" title="Pedidos"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg></span><span>Pedidos</span></a><a class="nav-link " href="reservas.html" title="Reservas"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span><span>Reservas</span></a><a class="nav-link " href="catalogo.html" title="Catálogo"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m21 16-9 5-9-5V8l9-5 9 5Z"/><path d="m3.3 7.3 8.7 4.9 8.7-4.9"/><path d="M12 22V12"/></svg></span><span>Catálogo</span></a><span class="nav-group-label">Automatización</span><a class="nav-link " href="bots.html" title="Bots"><span class="nav-icon"><img src="assets/ic-actions-emultiple-edit-Dnx9HjSL.svg" alt="Administrar Bots"></span><span>Bots</span></a><a class="nav-link active" href="multimedia.html" title="Multimedia"><span class="nav-icon"><img src="assets/ic-contact-browser-NDtLyHKt.svg" alt="Administrar Medios"></span><span>Multimedia</span></a><a class="nav-link " href="envio-masivo.html" title="Envíos Masivos"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span><span>Envíos Masivos</span></a><span class="nav-group-label">Sistema</span><a class="nav-link " href="configuracion.html" title="Configuración"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.8 1.8 0 0 0 15 19.4a1.8 1.8 0 0 0-1 .6 1.8 1.8 0 0 0-.5 1.3V21a2 2 0 1 1-4 0v-.1a1.8 1.8 0 0 0-1.4-1.76 1.8 1.8 0 0 0-1.98.36l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-.6-1 1.8 1.8 0 0 0-1.3-.5H2.6a2 2 0 1 1 0-4h.1A1.8 1.8 0 0 0 4.46 8.1 1.8 1.8 0 0 0 4.1 6.12l-.06-.06A2 2 0 1 1 6.87 3.23l.06.06A1.8 1.8 0 0 0 9 4.6c.4-.17.73-.4 1-.7.3-.36.5-.8.5-1.3V2.5a2 2 0 1 1 4 0v.1A1.8 1.8 0 0 0 15.9 4.36a1.8 1.8 0 0 0 1.98-.36l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.8 1.8 0 0 0 19.4 9c.17.4.4.73.7 1 .36.3.8.5 1.3.5h.1a2 2 0 1 1 0 4h-.1A1.8 1.8 0 0 0 19.4 15Z"/></svg></span><span>Configuración</span></a></nav>
           <a class="tenant-card mobile-tenant" href="inicio.html"><span>Vanity</span><span class="avatar">V</span></a>
         </div>
@@ -1071,11 +1100,25 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
         secretToggle.title = showing ? 'Mostrar' : 'Ocultar';
       }
     }
+    var langBtn = e.target.closest('[data-set-language]');
+    if(langBtn){
+      var code = langBtn.getAttribute('data-set-language');
+      var label = code === 'EN' ? 'English' : 'Español';
+      document.querySelectorAll('.language-selector').forEach(function(sel){
+        var codeEl = sel.querySelector('span');
+        var labelEl = sel.querySelector('strong');
+        if(codeEl) codeEl.textContent = code;
+        if(labelEl) labelEl.textContent = label;
+      });
+      var panel = langBtn.closest('.dropdown-panel');
+      if(panel) panel.classList.remove('open');
+      showToast('Idioma cambiado a ' + label, 'success');
+    }
   });
 
   document.querySelectorAll('[data-secret-toggle]').forEach(function(b){b.innerHTML=EYE_ICON;});
 })();(function(){
-  var listCounts = {"Interés en producto":233,"Seguimiento de pedido":187,"Requiere contacto":58,"Emprendedora belleza":96,"Listas para comprar":214,"Seguimiento de cliente":142};
+  var listCounts = {"Listas para comprar":214,"Seguimiento de pedido":187,"Emprendedora belleza":96,"Seguimiento de cliente":142,"Negocios con cita agendada":2,"Clientas VIP":3};
   var page = document.querySelector('.massive-page');
   if(!page) return;
   var sendBtn = document.querySelector('.massive-form [data-send-campaign]');
@@ -1110,11 +1153,103 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
     });
   }
 })();(function(){
+  var SEGMENT_VALUES = ["Interés en producto","Seguimiento de pedido","Requiere contacto","Emprendedora belleza","Listas para comprar","Seguimiento de cliente"];
+  var PIPELINE_VALUES = ["Nuevo lead","Calificado","Cita agendada","Cotización enviada","Ganado"];
+  var SEGMENT_COUNTS = {"Interés en producto":233,"Seguimiento de pedido":187,"Requiere contacto":58,"Emprendedora belleza":96,"Listas para comprar":214,"Seguimiento de cliente":142};
+  var PIPELINE_COUNTS = {"Nuevo lead":2,"Calificado":2,"Cita agendada":2,"Cotización enviada":1,"Ganado":1};
+  var listModal = document.getElementById('list-modal');
+  if(listModal){
+    var typeToggle = listModal.querySelector('[data-list-type-toggle]');
+    var dynamicBlock = listModal.querySelector('[data-list-dynamic]');
+    var manualBlock = listModal.querySelector('[data-list-manual]');
+    var rulesWrap = listModal.querySelector('[data-list-rules]');
+    var preview = listModal.querySelector('[data-rule-preview]');
+    function valuesFor(source){ return source === 'Etapa de pipeline' ? PIPELINE_VALUES : SEGMENT_VALUES; }
+    function countFor(source, value){ return (source === 'Etapa de pipeline' ? PIPELINE_COUNTS : SEGMENT_COUNTS)[value] || 0; }
+    function refreshValueSelect(row){
+      var sourceSel = row.querySelector('[data-rule-source]');
+      var valueSel = row.querySelector('[data-rule-value]');
+      if(!sourceSel || !valueSel) return;
+      var vals = valuesFor(sourceSel.value);
+      valueSel.innerHTML = vals.map(function(v){ return '<option>'+v+'</option>'; }).join('');
+    }
+    function updatePreview(){
+      var rows = rulesWrap.querySelectorAll('.list-rule-row');
+      var total = 0;
+      rows.forEach(function(row){
+        var sourceSel = row.querySelector('[data-rule-source]');
+        var valueSel = row.querySelector('[data-rule-value]');
+        if(sourceSel && valueSel) total += countFor(sourceSel.value, valueSel.value);
+      });
+      if(preview) preview.textContent = '≈ ' + total + ' cliente' + (total === 1 ? '' : 's') + ' coinciden';
+    }
+    if(typeToggle){
+      typeToggle.addEventListener('click', function(e){
+        var b = e.target.closest('[data-list-type]');
+        if(!b) return;
+        typeToggle.querySelectorAll('button').forEach(function(btn){ btn.classList.toggle('active', btn === b); });
+        var isDynamic = b.dataset.listType === 'dinamica';
+        if(dynamicBlock) dynamicBlock.classList.toggle('hidden', !isDynamic);
+        if(manualBlock) manualBlock.classList.toggle('hidden', isDynamic);
+      });
+    }
+    if(rulesWrap){
+      rulesWrap.addEventListener('change', function(e){
+        var row = e.target.closest('.list-rule-row');
+        if(!row) return;
+        if(e.target.matches('[data-rule-source]')) refreshValueSelect(row);
+        updatePreview();
+      });
+    }
+    var addRuleBtn = listModal.querySelector('[data-add-rule]');
+    if(addRuleBtn){
+      addRuleBtn.addEventListener('click', function(){
+        var rows = rulesWrap.querySelectorAll('.list-rule-row');
+        var clone = rows[rows.length - 1].cloneNode(true);
+        rulesWrap.appendChild(clone);
+        updatePreview();
+      });
+    }
+    listModal.addEventListener('click', function(e){
+      var removeBtn = e.target.closest('.list-rule-remove');
+      if(!removeBtn) return;
+      var rows = rulesWrap.querySelectorAll('.list-rule-row');
+      if(rows.length > 1){ removeBtn.closest('.list-rule-row').remove(); updatePreview(); }
+    });
+    updatePreview();
+  }
+  var addListModal = document.getElementById('add-to-list-modal');
+  var selectedCount = 0;
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('[data-bulk-add-list]');
+    if(trigger){
+      var table = trigger.closest('[data-bulk-table]');
+      selectedCount = table ? table.querySelectorAll('[data-bulk-row]:checked').length : 0;
+      var countLabel = addListModal && addListModal.querySelector('[data-add-list-count]');
+      if(countLabel) countLabel.textContent = 'Agregar ' + selectedCount + ' cliente' + (selectedCount === 1 ? '' : 's') + ' seleccionado' + (selectedCount === 1 ? '' : 's') + ' a una lista manual.';
+      return;
+    }
+    var confirmBtn = e.target.closest('[data-confirm-add-list]');
+    if(confirmBtn && addListModal){
+      var select = addListModal.querySelector('[data-add-list-select]');
+      var newNameInput = addListModal.querySelector('[data-add-list-new-name]');
+      var listName = select && select.value === '__new__' ? ((newNameInput && newNameInput.value.trim()) || 'Nueva lista') : (select ? select.value : '');
+      addListModal.classList.remove('open');
+      if(window.HBToast) window.HBToast(selectedCount + ' cliente' + (selectedCount === 1 ? '' : 's') + ' agregado' + (selectedCount === 1 ? '' : 's') + ' a "' + listName + '"', 'success');
+    }
+  });
+  document.addEventListener('change', function(e){
+    var select = e.target.closest('[data-add-list-select]');
+    if(!select || !addListModal) return;
+    var newField = addListModal.querySelector('[data-add-list-new]');
+    if(newField) newField.classList.toggle('hidden', select.value !== '__new__');
+  });
+})();(function(){
   document.addEventListener('click',function(e){
     var delBtn = e.target.closest('.row-action-btn.danger, .delete-chip');
     if(!delBtn || delBtn.hasAttribute('data-no-confirm')) return;
     e.preventDefault();
-    var container = delBtn.closest('tr, .real-bot-card, .media-card, .cuenta-card');
+    var container = delBtn.closest('tr, .real-bot-card, .media-card, .cuenta-card, .payment-method-row');
     var label = '';
     if(container){
       var nameEl = container.querySelector('.strong-text, strong');
@@ -1346,6 +1481,117 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
         window.HBToast('Tu plan ahora es "' + planName + '"', 'success');
       }
     });
+  });
+})();(function(){
+  function getTable(el){ return el.closest('[data-bulk-table]'); }
+  function updateBar(table){
+    var checks = table.querySelectorAll('[data-bulk-row]');
+    var checked = table.querySelectorAll('[data-bulk-row]:checked');
+    var allBox = table.querySelector('[data-bulk-all]');
+    var countEl = table.querySelector('[data-bulk-count]');
+    var delBtn = table.querySelector('[data-bulk-delete]');
+    var extraBtns = table.querySelectorAll('[data-bulk-extra]');
+    if(countEl) countEl.textContent = checked.length + ' seleccionado' + (checked.length === 1 ? '' : 's');
+    if(delBtn) delBtn.disabled = checked.length === 0;
+    extraBtns.forEach(function(b){ b.disabled = checked.length === 0; });
+    if(allBox){
+      allBox.checked = checks.length > 0 && checked.length === checks.length;
+      allBox.indeterminate = checked.length > 0 && checked.length < checks.length;
+    }
+  }
+  function setMode(table, active){
+    table.classList.toggle('bulk-mode', active);
+    var bar = table.querySelector('[data-bulk-bar]');
+    var dataTableEl = table.querySelector('table.data-table');
+    if(bar) bar.classList.toggle('hidden', !active);
+    if(dataTableEl) dataTableEl.classList.toggle('bulk-active', active);
+    var toggleBtn = table.querySelector('[data-bulk-toggle]');
+    if(toggleBtn) toggleBtn.textContent = active ? 'Cancelar selección' : 'Seleccionar';
+    if(!active){
+      table.querySelectorAll('[data-bulk-row], [data-bulk-all]').forEach(function(cb){ cb.checked = false; cb.indeterminate = false; });
+      updateBar(table);
+    }
+  }
+  document.addEventListener('click', function(e){
+    var toggleBtn = e.target.closest('[data-bulk-toggle]');
+    if(toggleBtn){
+      var table = getTable(toggleBtn);
+      if(table) setMode(table, !table.classList.contains('bulk-mode'));
+      return;
+    }
+    var cancelBtn = e.target.closest('[data-bulk-cancel]');
+    if(cancelBtn){
+      var table2 = getTable(cancelBtn);
+      if(table2) setMode(table2, false);
+      return;
+    }
+    var delBtn = e.target.closest('[data-bulk-delete]');
+    if(delBtn){
+      if(delBtn.disabled || !window.HBConfirm) return;
+      var table3 = getTable(delBtn);
+      if(!table3) return;
+      var checkedRows = Array.prototype.map.call(table3.querySelectorAll('[data-bulk-row]:checked'), function(cb){ return cb.closest('tr'); });
+      if(!checkedRows.length) return;
+      var n = checkedRows.length;
+      window.HBConfirm({
+        title: '¿Eliminar ' + n + ' elemento' + (n === 1 ? '' : 's') + '?',
+        message: 'Esta acción no se puede deshacer.',
+        onAccept: function(){
+          checkedRows.forEach(function(tr){
+            tr.style.transition = 'opacity .2s ease, transform .2s ease';
+            tr.style.opacity = '0';
+            tr.style.transform = 'scale(.97)';
+            setTimeout(function(){ tr.remove(); }, 200);
+          });
+          if(window.HBToast) window.HBToast(n + ' elemento' + (n === 1 ? '' : 's') + ' eliminado' + (n === 1 ? '' : 's'), 'success');
+          setTimeout(function(){ updateBar(table3); }, 210);
+        }
+      });
+    }
+  });
+  document.addEventListener('change', function(e){
+    var allBox = e.target.closest('[data-bulk-all]');
+    if(allBox){
+      var table = getTable(allBox);
+      if(!table) return;
+      table.querySelectorAll('[data-bulk-row]').forEach(function(cb){ cb.checked = allBox.checked; });
+      updateBar(table);
+      return;
+    }
+    var rowBox = e.target.closest('[data-bulk-row]');
+    if(rowBox){
+      var table2 = getTable(rowBox);
+      if(table2) updateBar(table2);
+    }
+  });
+})();(function(){
+  document.addEventListener('click', function(e){
+    var toggle = e.target.closest('[data-payment-type-toggle] button');
+    if(toggle){
+      var group = toggle.closest('[data-payment-type-toggle]');
+      group.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b === toggle); });
+      var modal = toggle.closest('.modal-card');
+      if(modal){
+        var isCard = toggle.dataset.paymentType === 'tarjeta';
+        var cardBlock = modal.querySelector('[data-payment-card]');
+        var transferBlock = modal.querySelector('[data-payment-transfer]');
+        if(cardBlock) cardBlock.classList.toggle('hidden', !isCard);
+        if(transferBlock) transferBlock.classList.toggle('hidden', isCard);
+      }
+      return;
+    }
+    var connectBtn = e.target.closest('[data-close-modal][data-toast]');
+    if(connectBtn){
+      var modalLayer = connectBtn.closest('.modal-layer');
+      if(!modalLayer) return;
+      var opener = document.querySelector('[data-open-modal="#' + modalLayer.id + '"]');
+      var card = opener && opener.closest('.channel-card');
+      if(card){
+        var pill = card.querySelector('.pill');
+        if(pill){ pill.textContent = 'Conectado'; pill.className = 'pill success'; }
+        opener.textContent = 'Configurar';
+      }
+    }
   });
 })();</script>
 </body>

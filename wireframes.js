@@ -289,11 +289,25 @@ document.addEventListener('click',event=>{if(event.target.closest('.delete-chip'
         secretToggle.title = showing ? 'Mostrar' : 'Ocultar';
       }
     }
+    var langBtn = e.target.closest('[data-set-language]');
+    if(langBtn){
+      var code = langBtn.getAttribute('data-set-language');
+      var label = code === 'EN' ? 'English' : 'Español';
+      document.querySelectorAll('.language-selector').forEach(function(sel){
+        var codeEl = sel.querySelector('span');
+        var labelEl = sel.querySelector('strong');
+        if(codeEl) codeEl.textContent = code;
+        if(labelEl) labelEl.textContent = label;
+      });
+      var panel = langBtn.closest('.dropdown-panel');
+      if(panel) panel.classList.remove('open');
+      showToast('Idioma cambiado a ' + label, 'success');
+    }
   });
 
   document.querySelectorAll('[data-secret-toggle]').forEach(function(b){b.innerHTML=EYE_ICON;});
 })();(function(){
-  var listCounts = {"Interés en producto":233,"Seguimiento de pedido":187,"Requiere contacto":58,"Emprendedora belleza":96,"Listas para comprar":214,"Seguimiento de cliente":142};
+  var listCounts = {"Listas para comprar":214,"Seguimiento de pedido":187,"Emprendedora belleza":96,"Seguimiento de cliente":142,"Negocios con cita agendada":2,"Clientas VIP":3};
   var page = document.querySelector('.massive-page');
   if(!page) return;
   var sendBtn = document.querySelector('.massive-form [data-send-campaign]');
@@ -328,11 +342,103 @@ document.addEventListener('click',event=>{if(event.target.closest('.delete-chip'
     });
   }
 })();(function(){
+  var SEGMENT_VALUES = ["Interés en producto","Seguimiento de pedido","Requiere contacto","Emprendedora belleza","Listas para comprar","Seguimiento de cliente"];
+  var PIPELINE_VALUES = ["Nuevo lead","Calificado","Cita agendada","Cotización enviada","Ganado"];
+  var SEGMENT_COUNTS = {"Interés en producto":233,"Seguimiento de pedido":187,"Requiere contacto":58,"Emprendedora belleza":96,"Listas para comprar":214,"Seguimiento de cliente":142};
+  var PIPELINE_COUNTS = {"Nuevo lead":2,"Calificado":2,"Cita agendada":2,"Cotización enviada":1,"Ganado":1};
+  var listModal = document.getElementById('list-modal');
+  if(listModal){
+    var typeToggle = listModal.querySelector('[data-list-type-toggle]');
+    var dynamicBlock = listModal.querySelector('[data-list-dynamic]');
+    var manualBlock = listModal.querySelector('[data-list-manual]');
+    var rulesWrap = listModal.querySelector('[data-list-rules]');
+    var preview = listModal.querySelector('[data-rule-preview]');
+    function valuesFor(source){ return source === 'Etapa de pipeline' ? PIPELINE_VALUES : SEGMENT_VALUES; }
+    function countFor(source, value){ return (source === 'Etapa de pipeline' ? PIPELINE_COUNTS : SEGMENT_COUNTS)[value] || 0; }
+    function refreshValueSelect(row){
+      var sourceSel = row.querySelector('[data-rule-source]');
+      var valueSel = row.querySelector('[data-rule-value]');
+      if(!sourceSel || !valueSel) return;
+      var vals = valuesFor(sourceSel.value);
+      valueSel.innerHTML = vals.map(function(v){ return '<option>'+v+'</option>'; }).join('');
+    }
+    function updatePreview(){
+      var rows = rulesWrap.querySelectorAll('.list-rule-row');
+      var total = 0;
+      rows.forEach(function(row){
+        var sourceSel = row.querySelector('[data-rule-source]');
+        var valueSel = row.querySelector('[data-rule-value]');
+        if(sourceSel && valueSel) total += countFor(sourceSel.value, valueSel.value);
+      });
+      if(preview) preview.textContent = '≈ ' + total + ' cliente' + (total === 1 ? '' : 's') + ' coinciden';
+    }
+    if(typeToggle){
+      typeToggle.addEventListener('click', function(e){
+        var b = e.target.closest('[data-list-type]');
+        if(!b) return;
+        typeToggle.querySelectorAll('button').forEach(function(btn){ btn.classList.toggle('active', btn === b); });
+        var isDynamic = b.dataset.listType === 'dinamica';
+        if(dynamicBlock) dynamicBlock.classList.toggle('hidden', !isDynamic);
+        if(manualBlock) manualBlock.classList.toggle('hidden', isDynamic);
+      });
+    }
+    if(rulesWrap){
+      rulesWrap.addEventListener('change', function(e){
+        var row = e.target.closest('.list-rule-row');
+        if(!row) return;
+        if(e.target.matches('[data-rule-source]')) refreshValueSelect(row);
+        updatePreview();
+      });
+    }
+    var addRuleBtn = listModal.querySelector('[data-add-rule]');
+    if(addRuleBtn){
+      addRuleBtn.addEventListener('click', function(){
+        var rows = rulesWrap.querySelectorAll('.list-rule-row');
+        var clone = rows[rows.length - 1].cloneNode(true);
+        rulesWrap.appendChild(clone);
+        updatePreview();
+      });
+    }
+    listModal.addEventListener('click', function(e){
+      var removeBtn = e.target.closest('.list-rule-remove');
+      if(!removeBtn) return;
+      var rows = rulesWrap.querySelectorAll('.list-rule-row');
+      if(rows.length > 1){ removeBtn.closest('.list-rule-row').remove(); updatePreview(); }
+    });
+    updatePreview();
+  }
+  var addListModal = document.getElementById('add-to-list-modal');
+  var selectedCount = 0;
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('[data-bulk-add-list]');
+    if(trigger){
+      var table = trigger.closest('[data-bulk-table]');
+      selectedCount = table ? table.querySelectorAll('[data-bulk-row]:checked').length : 0;
+      var countLabel = addListModal && addListModal.querySelector('[data-add-list-count]');
+      if(countLabel) countLabel.textContent = 'Agregar ' + selectedCount + ' cliente' + (selectedCount === 1 ? '' : 's') + ' seleccionado' + (selectedCount === 1 ? '' : 's') + ' a una lista manual.';
+      return;
+    }
+    var confirmBtn = e.target.closest('[data-confirm-add-list]');
+    if(confirmBtn && addListModal){
+      var select = addListModal.querySelector('[data-add-list-select]');
+      var newNameInput = addListModal.querySelector('[data-add-list-new-name]');
+      var listName = select && select.value === '__new__' ? ((newNameInput && newNameInput.value.trim()) || 'Nueva lista') : (select ? select.value : '');
+      addListModal.classList.remove('open');
+      if(window.HBToast) window.HBToast(selectedCount + ' cliente' + (selectedCount === 1 ? '' : 's') + ' agregado' + (selectedCount === 1 ? '' : 's') + ' a "' + listName + '"', 'success');
+    }
+  });
+  document.addEventListener('change', function(e){
+    var select = e.target.closest('[data-add-list-select]');
+    if(!select || !addListModal) return;
+    var newField = addListModal.querySelector('[data-add-list-new]');
+    if(newField) newField.classList.toggle('hidden', select.value !== '__new__');
+  });
+})();(function(){
   document.addEventListener('click',function(e){
     var delBtn = e.target.closest('.row-action-btn.danger, .delete-chip');
     if(!delBtn || delBtn.hasAttribute('data-no-confirm')) return;
     e.preventDefault();
-    var container = delBtn.closest('tr, .real-bot-card, .media-card, .cuenta-card');
+    var container = delBtn.closest('tr, .real-bot-card, .media-card, .cuenta-card, .payment-method-row');
     var label = '';
     if(container){
       var nameEl = container.querySelector('.strong-text, strong');
@@ -564,5 +670,116 @@ document.addEventListener('click',event=>{if(event.target.closest('.delete-chip'
         window.HBToast('Tu plan ahora es "' + planName + '"', 'success');
       }
     });
+  });
+})();(function(){
+  function getTable(el){ return el.closest('[data-bulk-table]'); }
+  function updateBar(table){
+    var checks = table.querySelectorAll('[data-bulk-row]');
+    var checked = table.querySelectorAll('[data-bulk-row]:checked');
+    var allBox = table.querySelector('[data-bulk-all]');
+    var countEl = table.querySelector('[data-bulk-count]');
+    var delBtn = table.querySelector('[data-bulk-delete]');
+    var extraBtns = table.querySelectorAll('[data-bulk-extra]');
+    if(countEl) countEl.textContent = checked.length + ' seleccionado' + (checked.length === 1 ? '' : 's');
+    if(delBtn) delBtn.disabled = checked.length === 0;
+    extraBtns.forEach(function(b){ b.disabled = checked.length === 0; });
+    if(allBox){
+      allBox.checked = checks.length > 0 && checked.length === checks.length;
+      allBox.indeterminate = checked.length > 0 && checked.length < checks.length;
+    }
+  }
+  function setMode(table, active){
+    table.classList.toggle('bulk-mode', active);
+    var bar = table.querySelector('[data-bulk-bar]');
+    var dataTableEl = table.querySelector('table.data-table');
+    if(bar) bar.classList.toggle('hidden', !active);
+    if(dataTableEl) dataTableEl.classList.toggle('bulk-active', active);
+    var toggleBtn = table.querySelector('[data-bulk-toggle]');
+    if(toggleBtn) toggleBtn.textContent = active ? 'Cancelar selección' : 'Seleccionar';
+    if(!active){
+      table.querySelectorAll('[data-bulk-row], [data-bulk-all]').forEach(function(cb){ cb.checked = false; cb.indeterminate = false; });
+      updateBar(table);
+    }
+  }
+  document.addEventListener('click', function(e){
+    var toggleBtn = e.target.closest('[data-bulk-toggle]');
+    if(toggleBtn){
+      var table = getTable(toggleBtn);
+      if(table) setMode(table, !table.classList.contains('bulk-mode'));
+      return;
+    }
+    var cancelBtn = e.target.closest('[data-bulk-cancel]');
+    if(cancelBtn){
+      var table2 = getTable(cancelBtn);
+      if(table2) setMode(table2, false);
+      return;
+    }
+    var delBtn = e.target.closest('[data-bulk-delete]');
+    if(delBtn){
+      if(delBtn.disabled || !window.HBConfirm) return;
+      var table3 = getTable(delBtn);
+      if(!table3) return;
+      var checkedRows = Array.prototype.map.call(table3.querySelectorAll('[data-bulk-row]:checked'), function(cb){ return cb.closest('tr'); });
+      if(!checkedRows.length) return;
+      var n = checkedRows.length;
+      window.HBConfirm({
+        title: '¿Eliminar ' + n + ' elemento' + (n === 1 ? '' : 's') + '?',
+        message: 'Esta acción no se puede deshacer.',
+        onAccept: function(){
+          checkedRows.forEach(function(tr){
+            tr.style.transition = 'opacity .2s ease, transform .2s ease';
+            tr.style.opacity = '0';
+            tr.style.transform = 'scale(.97)';
+            setTimeout(function(){ tr.remove(); }, 200);
+          });
+          if(window.HBToast) window.HBToast(n + ' elemento' + (n === 1 ? '' : 's') + ' eliminado' + (n === 1 ? '' : 's'), 'success');
+          setTimeout(function(){ updateBar(table3); }, 210);
+        }
+      });
+    }
+  });
+  document.addEventListener('change', function(e){
+    var allBox = e.target.closest('[data-bulk-all]');
+    if(allBox){
+      var table = getTable(allBox);
+      if(!table) return;
+      table.querySelectorAll('[data-bulk-row]').forEach(function(cb){ cb.checked = allBox.checked; });
+      updateBar(table);
+      return;
+    }
+    var rowBox = e.target.closest('[data-bulk-row]');
+    if(rowBox){
+      var table2 = getTable(rowBox);
+      if(table2) updateBar(table2);
+    }
+  });
+})();(function(){
+  document.addEventListener('click', function(e){
+    var toggle = e.target.closest('[data-payment-type-toggle] button');
+    if(toggle){
+      var group = toggle.closest('[data-payment-type-toggle]');
+      group.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b === toggle); });
+      var modal = toggle.closest('.modal-card');
+      if(modal){
+        var isCard = toggle.dataset.paymentType === 'tarjeta';
+        var cardBlock = modal.querySelector('[data-payment-card]');
+        var transferBlock = modal.querySelector('[data-payment-transfer]');
+        if(cardBlock) cardBlock.classList.toggle('hidden', !isCard);
+        if(transferBlock) transferBlock.classList.toggle('hidden', isCard);
+      }
+      return;
+    }
+    var connectBtn = e.target.closest('[data-close-modal][data-toast]');
+    if(connectBtn){
+      var modalLayer = connectBtn.closest('.modal-layer');
+      if(!modalLayer) return;
+      var opener = document.querySelector('[data-open-modal="#' + modalLayer.id + '"]');
+      var card = opener && opener.closest('.channel-card');
+      if(card){
+        var pill = card.querySelector('.pill');
+        if(pill){ pill.textContent = 'Conectado'; pill.className = 'pill success'; }
+        opener.textContent = 'Configurar';
+      }
+    }
   });
 })();

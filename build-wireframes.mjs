@@ -48,6 +48,8 @@ const iconSvg = (name) => ({
   eye: '<svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
   eyeOff: '<svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c7 0 10.5 7 10.5 7a13.5 13.5 0 0 1-3.1 4"/><path d="M6.5 6.6C3.4 8.5 1.5 12 1.5 12s3.5 7 10.5 7a10.5 10.5 0 0 0 4.2-.9"/><path d="M9.9 10a3 3 0 0 0 4.1 4.1"/></svg>',
   check: '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>',
+  card: '<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>',
+  bank: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M4 21V10"/><path d="M20 21V10"/><path d="M8 21V10"/><path d="M16 21V10"/><path d="M12 21V10"/><path d="m2 10 10-6 10 6"/></svg>',
 }[name]);
 
 const navItems = [
@@ -103,7 +105,7 @@ const layout = (title, active, content) => `<!doctype html>
           <button type="button" data-theme-set="dark" title="Modo oscuro" aria-label="Modo oscuro">${iconSvg('moon')}</button>
         </div>
       </div>
-      <div id="language-menu" class="dropdown-panel"><button>ES Español</button><button>EN English</button></div>
+      <div id="language-menu" class="dropdown-panel"><button type="button" data-set-language="ES">ES Español</button><button type="button" data-set-language="EN">EN English</button></div>
       <nav class="nav" aria-label="Navegación principal">${nav(active)}</nav>
       <a class="tenant-card" href="inicio.html"><span>Vanity</span><span class="avatar">V</span></a>
       <button class="sidebar-toggle" type="button" data-sidebar-toggle>${iconSvg('chevronLeft')}</button>
@@ -119,7 +121,7 @@ const layout = (title, active, content) => `<!doctype html>
               <button type="button" data-theme-set="dark" title="Modo oscuro" aria-label="Modo oscuro">${iconSvg('moon')}</button>
             </div>
           </div>
-          <div id="mobile-language-menu" class="dropdown-panel"><button>ES Español</button><button>EN English</button></div>
+          <div id="mobile-language-menu" class="dropdown-panel"><button type="button" data-set-language="ES">ES Español</button><button type="button" data-set-language="EN">EN English</button></div>
           <nav class="nav mobile-nav" aria-label="Navegación móvil">${nav(active)}</nav>
           <a class="tenant-card mobile-tenant" href="inicio.html"><span>Vanity</span><span class="avatar">V</span></a>
         </div>
@@ -165,17 +167,36 @@ const controls = (cols) => `
 const dataTable = (cols, rows, options = {}) => {
   const acts = options.actions;
   const withActions = !!(acts && (acts.edit || acts.del));
+  const bulk = withActions && !!acts.del;
   const allCols = withActions ? [...cols, ''] : cols;
   const actionsCell = () => `<td class="row-actions">${acts.edit ? `<button class="row-action-btn" type="button" title="${acts.edit}" aria-label="${acts.edit}">${iconSvg('edit')}</button>` : ''}${acts.del ? `<button class="row-action-btn danger" type="button" title="${acts.del}" aria-label="${acts.del}">${iconSvg('trash')}</button>` : ''}</td>`;
-  return `
-  ${controls(cols)}
+  const bulkHeadCell = bulk ? `<th class="bulk-col"><input type="checkbox" data-bulk-all aria-label="Seleccionar todo"></th>` : '';
+  const bulkRowCell = bulk ? `<td class="bulk-col"><input type="checkbox" data-bulk-row aria-label="Seleccionar fila"></td>` : '';
+  const table = `
   <div class="table-wrap">
     <table class="data-table" style="min-width:${options.minWidth || '980px'}">
-      <thead><tr>${allCols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
-      <tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}${withActions ? actionsCell() : ''}</tr>`).join('')}</tbody>
+      <thead><tr>${bulkHeadCell}${allCols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(row => `<tr>${bulkRowCell}${row.map(cell => `<td>${cell}</td>`).join('')}${withActions ? actionsCell() : ''}</tr>`).join('')}</tbody>
     </table>
   </div>
   <div class="pagination"><button class="page-btn" disabled>${iconSvg('chevronLeft')}</button><span>Página 1 de ${options.pages || 1}</span><button class="page-btn">${iconSvg('chevronRight')}</button><span>Mostrar</span><select class="rows-select"><option>5</option><option>10</option><option selected>20</option><option>50</option><option>100</option><option>500</option></select>${options.total ? `<span class="total">${options.total}</span>` : ''}</div>`;
+  if (!bulk) return `${controls(cols)}${table}`;
+  return `<div class="bulk-table" data-bulk-table>
+    <div class="table-controls">
+      <label class="table-search"><span>${iconSvg('search')}</span><input class="filter-input" type="text" placeholder="Filtrar por palabra clave..."></label>
+      <select class="sort-select"><option>Ordenar por</option>${cols.map(c => `<option>${c}</option>`).join('')}</select>
+      <button type="button" class="btn secondary bulk-toggle-btn" data-bulk-toggle>Seleccionar</button>
+    </div>
+    <div class="bulk-bar hidden" data-bulk-bar>
+      <span data-bulk-count>0 seleccionados</span>
+      <div class="header-actions">
+        <button type="button" class="btn secondary" data-bulk-cancel>Cancelar</button>
+        ${(options.bulkActions || []).map(a => `<button type="button" class="btn secondary" data-bulk-extra ${a.attr} disabled>${a.icon ? iconSvg(a.icon) : ''} ${a.label}</button>`).join('')}
+        <button type="button" class="btn danger" data-bulk-delete disabled>${iconSvg('trash')} Eliminar seleccionados</button>
+      </div>
+    </div>
+    ${table}
+  </div>`;
 };
 
 const modal = (id, title, body, wide = '') => `
@@ -364,7 +385,26 @@ const chatClient = (name, phone, last, time, initials, active = false, unread = 
     <button class="client-pause" type="button" aria-label="Pausar bot">${iconSvg('pause')}</button>
   </div>`;
 const mediaCard = (type, name, size, visibility = 'Público') => `<article class="media-card" data-open-modal="#media-modal"><div class="media-thumb">${type}<button class="delete-chip" type="button">${iconSvg('trash')}</button></div><div class="media-info"><strong>${name}</strong><span>${size}</span>${status(visibility,'success')}</div></article>`;
-const listChip = (name) => `<span class="massive-list-chip"><button type="button">${name} <i>${LIST_COUNTS[name] || 0}</i></button><button type="button" aria-label="Eliminar ${name}">×</button></span>`;
+const MASSIVE_LISTS = [
+  { name: 'Listas para comprar', type: 'dinamica', source: 'segmento', value: 'Listas para comprar', count: LIST_COUNTS['Listas para comprar'] },
+  { name: 'Seguimiento de pedido', type: 'dinamica', source: 'segmento', value: 'Seguimiento de pedido', count: LIST_COUNTS['Seguimiento de pedido'] },
+  { name: 'Emprendedora belleza', type: 'dinamica', source: 'segmento', value: 'Emprendedora belleza', count: LIST_COUNTS['Emprendedora belleza'] },
+  { name: 'Seguimiento de cliente', type: 'dinamica', source: 'segmento', value: 'Seguimiento de cliente', count: LIST_COUNTS['Seguimiento de cliente'] },
+  { name: 'Negocios con cita agendada', type: 'dinamica', source: 'pipeline', value: 'Cita agendada', count: PIPELINE_DEALS.filter(d => d.stage === 'cita').length },
+  { name: 'Clientas VIP', type: 'manual', source: 'manual', value: null, count: 3 },
+];
+const listRuleText = (l) => {
+  if (l.source === 'manual') return '<span class="muted-text">Agregada a mano</span>';
+  if (l.source === 'segmento') return `Segmento es "${l.value}"`;
+  if (l.source === 'pipeline') return `Etapa de pipeline es "${l.value}"`;
+  return '';
+};
+const addToListModal = modal('add-to-list-modal', 'Agregar a lista', `
+  <p class="muted-p" style="margin-top:-4px" data-add-list-count>Agregar clientes seleccionados a una lista manual.</p>
+  <div class="field"><span>Lista</span><select class="select" data-add-list-select>${MASSIVE_LISTS.filter(l => l.type === 'manual').map(l => `<option>${l.name}</option>`).join('')}<option value="__new__">+ Crear nueva lista manual</option></select></div>
+  <div class="hidden field" data-add-list-new><span>Nombre de la nueva lista</span><input class="input" placeholder="Ej. Clientas VIP Norte" data-add-list-new-name></div>
+  ${btn('Agregar', 'primary', 'data-confirm-add-list')}
+`);
 const searchable = (label, placeholder, searchPlaceholder, value = '') => `
   <div class="field">
     <span>${label}</span>
@@ -609,7 +649,7 @@ const clients = layout('Clientes', 'clients', `
         [strong('Juan Carlos Garcia','Cliente frecuente'), segment('Seguimiento de pedido'), '573212345467', '26/06/2026', '<a class="inline-link" href="chat.html">Abrir chat</a>'],
         [strong('Yanidy Miranda','Interés en producto'), segment('Interés en producto'), '573216236735', '26/06/2026', '<a class="inline-link" href="chat.html">Abrir chat</a>'],
         [strong('Aleja Nails','Emprendedora belleza'), segment('Emprendedora belleza'), '573142135346', '25/06/2026', '<a class="inline-link" href="chat.html">Abrir chat</a>'],
-      ], {pages:64,total:'1.284 registros',minWidth:'620px', actions:{edit:'Editar',del:'Eliminar'}})}
+      ], {pages:64,total:'1.284 registros',minWidth:'620px', actions:{edit:'Editar',del:'Eliminar'}, bulkActions:[{label:'Agregar a lista', icon:'boxes', attr:'data-bulk-add-list data-open-modal="#add-to-list-modal"'}]})}
     </section>
     <section class="hidden" data-tab-panel="pipeline">
       <div class="section-header"><h1 class="heading-primary" style="margin-bottom:0">Pipeline de ventas</h1>${btn('Crear negocio','primary','data-open-modal="#client-modal"')}</div>
@@ -624,6 +664,7 @@ const clients = layout('Clientes', 'clients', `
   ${modal('client-modal','Crear Cliente', `<div class="form-grid">${field('Nombre', input())}${field('Apellidos', input())}${field('WhatsApp', input())}${field('Segmento', select(['Interés en producto','Seguimiento de pedido','Emprendedora belleza']))}</div>${btn('Crear','primary')}`)}
   ${stageModal}
   ${pipelineDetailModal}
+  ${addToListModal}
   ${modal('import-modal','Importar clientes', `<div class="empty-state">Selecciona un archivo CSV o XLSX para previsualizar clientes antes de importarlos.</div>${btn('Importar','primary')}`)}
   ${modal('segment-modal','Crear segmento', `
     <div class="field"><span>Nombre del segmento</span><input class="input" placeholder="Ej. Clienta VIP" data-segment-preview-name></div>
@@ -775,6 +816,44 @@ const PLAN_FEATURES = [
 ];
 const planIncludes = (planName, fromName) => PLANS.findIndex(p => p.name === planName) >= PLANS.findIndex(p => p.name === fromName);
 const CURRENT_PLAN = 'Business';
+const PAYMENT_METHODS = [
+  { type: 'Tarjeta', brand: 'Visa', last4: '4242', holder: 'Vanity Beauty SAS', exp: '08/28', default: true },
+];
+const paymentMethodRow = (m) => `<div class="payment-method-row">
+  <span class="payment-method-icon">${iconSvg('card')}</span>
+  <div class="payment-method-copy"><strong>${m.brand} •••• ${m.last4}</strong><span>Vence ${m.exp} · ${m.holder}</span></div>
+  ${m.default ? status('Predeterminado', 'success') : ''}
+  <button class="row-action-btn" type="button" title="Editar" aria-label="Editar">${iconSvg('edit')}</button>
+  <button class="row-action-btn danger" type="button" title="Eliminar" aria-label="Eliminar">${iconSvg('trash')}</button>
+</div>`;
+const paymentMethodModal = modal('payment-method-modal', 'Agregar método de pago', `
+  <div class="field"><span>Tipo de método</span>
+    <div class="segmented" data-payment-type-toggle>
+      <button type="button" class="active" data-payment-type="tarjeta">Tarjeta</button>
+      <button type="button" data-payment-type="transferencia">Transferencia bancaria</button>
+    </div>
+  </div>
+  <div data-payment-card>
+    <div class="form-grid">
+      ${field('Número de tarjeta', input('placeholder="1234 5678 9012 3456"'))}
+      ${field('Nombre en la tarjeta', input('placeholder="Como aparece en la tarjeta"'))}
+      ${field('Vencimiento', input('placeholder="MM/AA"'))}
+      ${field('CVV', input('placeholder="123"'))}
+    </div>
+    ${btn('Guardar tarjeta', 'primary', 'data-toast="Tarjeta agregada" data-toast-type="success" data-close-modal')}
+  </div>
+  <div class="hidden" data-payment-transfer>
+    <div class="pipe-info-banner"><strong>Recomendado para el plan anual.</strong> Evita comisiones de pasarela y no tiene límite de monto — las pasarelas como ePayco rechazan transacciones grandes como un pago anual completo.</div>
+    <div class="summary-grid">
+      <div class="summary-card"><span>Banco</span><strong>Bancolombia</strong></div>
+      <div class="summary-card"><span>Tipo de cuenta</span><strong>Ahorros</strong></div>
+      <div class="summary-card"><span>Número de cuenta</span><strong>123-456789-00</strong></div>
+      <div class="summary-card"><span>A nombre de</span><strong>HalconBot SAS · NIT 900.123.456-7</strong></div>
+    </div>
+    <p class="muted-p top-space">Envía tu comprobante a <strong>pagos@halconbot.com</strong> o adjúntalo aquí para activar el plan anual.</p>
+    <div class="header-actions top-space">${btn('Adjuntar comprobante', 'secondary')}${btn('Ya transferí', 'primary', 'data-toast="Comprobante recibido, validaremos tu pago" data-toast-type="success" data-close-modal')}</div>
+  </div>
+`);
 const planCard = (p) => {
   const count = PLAN_FEATURES.filter(f => planIncludes(p.name, f.from)).length;
   const isCurrent = p.name === CURRENT_PLAN;
@@ -801,7 +880,7 @@ const currentPlanSummary = () => {
         <h2 style="margin:10px 0 4px">${plan.name}</h2>
         <p class="muted-p" style="margin:0">$${plan.price} USD/mes · próxima renovación 1 de octubre de 2026</p>
       </div>
-      <div class="header-actions">${btn('Cambiar método de pago', 'secondary')}${btn('Cancelar plan', 'secondary')}</div>
+      <div class="header-actions">${btn('Cambiar método de pago', 'secondary', 'data-open-modal="#payment-method-modal"')}${btn('Cancelar plan', 'secondary')}</div>
     </div>
     <div class="current-plan-features">
       <div class="cpf-col">
@@ -827,7 +906,7 @@ const settings = layout('Configuración', 'settings', `
     </nav>
 
       <div data-tab-panel="general">
-        <section class="settings-section"><h2>Idioma del sistema</h2><button class="language-selector inline"><span>ES</span><strong>Español</strong><span class="chevron">⌄</span></button></section>
+        <section class="settings-section"><h2>Idioma del sistema</h2><button type="button" class="language-selector inline" data-toggle-class="open" data-target="#settings-language-menu"><span>ES</span><strong>Español</strong><span class="chevron">⌄</span></button><div id="settings-language-menu" class="dropdown-panel"><button type="button" data-set-language="ES">ES Español</button><button type="button" data-set-language="EN">EN English</button></div></section>
         <section class="settings-section"><h2>Notificaciones Push</h2><div class="push-card"><strong>${iconSvg('bell')} Notificaciones activas</strong><button class="btn secondary" data-toast="Token renovado" data-toast-type="success">${iconSvg('refresh')} Renovar token</button></div><p class="muted-p">Recibirás notificaciones de nuevos mensajes. Activado el 12/04/2026, 06:05 p. m.</p></section>
         <section class="settings-section">${field('Correos adicionales de notificación', input('placeholder="ejemplo@correo.com, otro@correo.com"'))}${btn('Guardar','secondary','data-toast="Correos actualizados" data-toast-type="success"')}</section>
         <section class="settings-section"><h2>Fallback de catálogo</h2><label class="checkbox-row"><input type="checkbox" checked>Activar envío automático de catálogo PDF cuando la búsqueda devuelva aproximados o ningún producto.</label>${field('Mensaje del fallback', textarea('rows="4" placeholder="Mensaje del fallback"'))}<div class="header-actions">${btn('Seleccionar PDF','secondary')}${btn('Restaurar mensaje por defecto','secondary')}${btn('Limpiar PDF','secondary')}<span class="muted-text">PDF configurado: catalogo-belleza-2026.pdf</span></div></section>
@@ -844,6 +923,30 @@ const settings = layout('Configuración', 'settings', `
           </div>
           <div class="top-space">${btn('Generar token Hub','secondary','data-generate="wa-hub-token" data-toast="Token del Hub generado" data-toast-type="success"')}</div>
         </section>
+        <section class="settings-section">
+          <h2>Otros canales</h2>
+          <p class="muted-p">Conecta canales adicionales para atender a tus clientes desde un solo lugar, sin salir de HalconBot.</p>
+          <div class="channel-grid">
+            <div class="channel-card">
+              <span class="channel-icon messenger">${iconSvg('chat')}</span>
+              <div class="channel-copy"><strong>Messenger</strong><span>Meta Business · Facebook</span></div>
+              ${status('No conectado', 'neutral')}
+              <button class="btn secondary" type="button" data-open-modal="#messenger-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon instagram">${iconSvg('photo')}</span>
+              <div class="channel-copy"><strong>Instagram</strong><span>Inbox de Instagram Direct</span></div>
+              ${status('No conectado', 'neutral')}
+              <button class="btn secondary" type="button" data-open-modal="#instagram-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon telegram">${iconSvg('send')}</span>
+              <div class="channel-copy"><strong>Telegram</strong><span>Bot de Telegram</span></div>
+              ${status('No conectado', 'neutral')}
+              <button class="btn secondary" type="button" data-open-modal="#telegram-modal">Conectar</button>
+            </div>
+          </div>
+        </section>
       </div>
 
       <div class="hidden" data-tab-panel="integraciones">
@@ -852,6 +955,24 @@ const settings = layout('Configuración', 'settings', `
         <section class="settings-section"><h2>99envíos</h2><p class="muted-p">Configura la autenticación y los valores base del negocio para las cotizaciones desacopladas del chatbot.</p><div class="form-grid">${field('URL base 99envíos', input('placeholder="https://integration1.99envios.app"'))}${field('Timeout 99envíos (segundos)', input('placeholder="15"'))}${field('Email 99envíos', input('placeholder="usuario@ejemplo.com"'))}${secretField('Password 99envíos', 'Ingresa la password de 99envíos', 'envios-password')}${field('Ciudad origen', select(['BOGOTA D.C. [11001000]']))}${field('Transportadora preferida', select(['Selecciona una transportadora preferida','Interrapidisimo','TCC','Servientrega','Coordinadora','Envia']))}</div><div class="checkbox-grid"><label><input type="checkbox" checked> Permitir fallback si la preferida falla</label><label><input type="checkbox" checked> Mostrar nombre de transportadora seleccionada</label><label><input type="checkbox"> Activar contrapago por defecto</label></div>${btn('Actualizar','primary','data-toast="Configuración de 99envíos actualizada" data-toast-type="success"')}</section>
 
         <section class="settings-section"><h2>Conexiones e-commerce</h2><p class="muted-p">Crea y administra las credenciales técnicas que usará el plugin WooCommerce para sincronizar el catálogo con el chatbot.</p><h3>Nueva conexión</h3><div class="form-grid">${field('Proveedor', select(['WooCommerce']))}${field('Nombre visible', input('placeholder="Tienda principal"'))}${field('URL de la tienda', input('placeholder="https://mitienda.com"'))}</div><div class="header-actions top-space">${btn('Crear conexión','primary','data-toast="Conexión creada" data-toast-type="success"')}${btn('Actualizar listado','secondary')}</div><h3>Conexiones existentes</h3><div class="table-wrap">${dataTable(['Proveedor','Nombre','URL','Estado','Última actividad','Última sincronización','Creada'], [['WooCommerce','JuankaWeb','http://localhost:8080/juankaweb',status('Activa','success'),'17/8/2026','13/8/2026','13/8/2026'],['WooCommerce','Osy','https://osydistribuidores.com',status('Activa','success'),'Nunca','Nunca','12/8/2026']], {actions:{edit:'Rotar token',del:'Revocar'},minWidth:'900px'})}</div></section>
+        <section class="settings-section">
+          <h2>CRMs externos</h2>
+          <p class="muted-p">Sincroniza tus clientes y el pipeline de HalconBot con el CRM que ya usa tu equipo.</p>
+          <div class="channel-grid">
+            <div class="channel-card">
+              <span class="channel-icon zoho">${iconSvg('boxes')}</span>
+              <div class="channel-copy"><strong>Zoho CRM</strong><span>Sincroniza clientes y negocios</span></div>
+              ${status('No conectado', 'neutral')}
+              <button class="btn secondary" type="button" data-open-modal="#zoho-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon hubspot">${iconSvg('sales')}</span>
+              <div class="channel-copy"><strong>HubSpot</strong><span>Sincroniza contactos y pipeline</span></div>
+              ${status('No conectado', 'neutral')}
+              <button class="btn secondary" type="button" data-open-modal="#hubspot-modal">Conectar</button>
+            </div>
+          </div>
+        </section>
       </div>
 
       <div class="hidden" data-tab-panel="planes">
@@ -866,6 +987,10 @@ const settings = layout('Configuración', 'settings', `
           <div class="plans-row">${PLANS.map(planCard).join('')}</div>
         </section>
         <section class="settings-section">
+          <div class="section-header"><h3 style="margin-bottom:0">Métodos de pago</h3>${btn('Agregar método de pago', 'secondary', 'data-open-modal="#payment-method-modal"')}</div>
+          <div class="payment-methods-list">${PAYMENT_METHODS.map(paymentMethodRow).join('')}</div>
+        </section>
+        <section class="settings-section">
           <h3>Historial de facturación</h3>
           ${dataTable(['Fecha', 'Concepto', 'Monto', 'Estado'], [
             ['01/09/2026', `Plan ${CURRENT_PLAN} — septiembre`, `$${PLANS.find(p => p.name === CURRENT_PLAN).price} USD`, status('Pagado', 'success')],
@@ -875,6 +1000,12 @@ const settings = layout('Configuración', 'settings', `
         </section>
       </div>
   </div>
+  ${modal('messenger-modal', 'Conectar Messenger', `<p class="muted-p" style="margin-top:-4px">Encuentra estas credenciales en Meta for Developers → tu App → Messenger → Configuración.</p><div class="form-grid">${secretField('Token de acceso de la página', 'Ingresa el token de la página', 'messenger-token')}${field('ID de la página de Facebook', input('placeholder="Ingresa el ID de la página"'))}${secretField('App Secret', 'Ingresa el App Secret', 'messenger-secret')}</div>${btn('Conectar', 'primary', 'data-toast="Messenger conectado" data-toast-type="success" data-close-modal')}`)}
+  ${modal('instagram-modal', 'Conectar Instagram', `<p class="muted-p" style="margin-top:-4px">Tu cuenta de Instagram debe ser una cuenta profesional vinculada a una página de Facebook.</p><div class="form-grid">${field('ID de cuenta de Instagram Business', input('placeholder="Ingresa el ID de la cuenta"'))}${secretField('Token de acceso', 'Ingresa el token de acceso', 'instagram-token')}</div>${btn('Conectar', 'primary', 'data-toast="Instagram conectado" data-toast-type="success" data-close-modal')}`)}
+  ${modal('telegram-modal', 'Conectar Telegram', `<p class="muted-p" style="margin-top:-4px">Crea un bot con @BotFather en Telegram y pega aquí el token que te entrega.</p><div class="form-grid">${secretField('Token del bot', 'Ingresa el token del bot', 'telegram-token')}${field('Usuario del bot', input('placeholder="@tu_negocio_bot"'))}</div>${btn('Conectar', 'primary', 'data-toast="Telegram conectado" data-toast-type="success" data-close-modal')}`)}
+  ${modal('zoho-modal', 'Conectar Zoho CRM', `<p class="muted-p" style="margin-top:-4px">Encuentra estas credenciales en Zoho API Console → Server-based Applications.</p><div class="form-grid">${secretField('Client ID', 'Ingresa el Client ID de Zoho', 'zoho-client-id')}${secretField('Client Secret', 'Ingresa el Client Secret de Zoho', 'zoho-client-secret')}${field('Región del centro de datos', select(['.com (EE. UU.)', '.eu (Europa)', '.in (India)', '.com.au (Australia)']))}</div>${btn('Conectar', 'primary', 'data-toast="Zoho CRM conectado" data-toast-type="success" data-close-modal')}`)}
+  ${modal('hubspot-modal', 'Conectar HubSpot', `<p class="muted-p" style="margin-top:-4px">Genera un token privado en HubSpot → Configuración → Integraciones → Apps privadas.</p><div class="form-grid">${secretField('Token de acceso privado', 'Ingresa el token de HubSpot', 'hubspot-token')}${field('Portal ID', input('placeholder="Ej. 12345678"'))}</div>${btn('Conectar', 'primary', 'data-toast="HubSpot conectado" data-toast-type="success" data-close-modal')}`)}
+  ${paymentMethodModal}
 `);
 
 const media = layout('Multimedia', 'media', `
@@ -918,8 +1049,14 @@ const media = layout('Multimedia', 'media', `
 const massive = layout('Envíos Masivos', 'massive', `
   <section class="massive-page">
     <div class="massive-lists-block">
-      <h1 class="heading-primary">Lista de clientes</h1>
-      <div class="massive-list-row">${listChip('Listas para comprar')}${listChip('Seguimiento de pedido')}${listChip('Emprendedora belleza')}${listChip('Seguimiento de cliente')}<button class="add-list" type="button" data-open-modal="#list-modal">+</button></div>
+      <div class="section-header"><h1 class="heading-primary" style="margin-bottom:0">Listas de clientes</h1>${btn('Crear lista', 'primary', 'data-open-modal="#list-modal"')}</div>
+      <p class="muted-p" style="margin-top:-6px">Las listas <strong>dinámicas</strong> se actualizan solas según segmento o etapa de pipeline. Las <strong>manuales</strong> se arman agregando clientes uno por uno desde Clientes.</p>
+      ${dataTable(['Nombre', 'Tipo', 'Regla', 'Contactos'], MASSIVE_LISTS.map(l => [
+        strong(l.name),
+        status(l.type === 'dinamica' ? 'Dinámica' : 'Manual', l.type === 'dinamica' ? 'blue' : 'neutral'),
+        listRuleText(l),
+        String(l.count),
+      ]), { minWidth: '680px', actions: { edit: 'Editar', del: 'Eliminar' } })}
     </div>
     <hr class="massive-separator">
     <div class="massive-grid">
@@ -937,7 +1074,7 @@ const massive = layout('Envíos Masivos', 'massive', `
             <div class="wa-bubble"><strong>Hola {{nombre_cliente}}</strong><p>Tenemos novedades para ti sobre {{producto}}. Responde este mensaje y validamos disponibilidad en {{ciudad}}.</p><small>10:45 a. m.</small></div>
           </div>
         </div>
-        ${field('Lista de clientes', select(['Selecciona la lista de clientes','Listas para comprar','Seguimiento de pedido','Emprendedora belleza']))}
+        ${field('Lista de clientes', select(['Selecciona la lista de clientes', ...MASSIVE_LISTS.map(l => l.name)]))}
         ${field('Programar envío (opcional)', input('placeholder="Selecciona la fecha de envío"'))}
         <button type="button" class="btn primary" data-send-campaign>${iconSvg('send')} Enviar</button>
       </section>
@@ -951,7 +1088,32 @@ const massive = layout('Envíos Masivos', 'massive', `
       </section>
     </div>
   </section>
-  ${modal('list-modal','Nueva lista de clientes', `<div class="form-grid">${field('Nombre', input('placeholder="Nombre de la lista"'))}${field('Segmento base', select(['Interés en producto','Seguimiento de pedido','Emprendedora belleza']))}</div>${btn('Crear lista','primary')}`)}
+  ${modal('list-modal', 'Crear lista', `
+    <div class="field"><span>Nombre de la lista</span><input class="input" placeholder="Ej. Clientas frecuentes"></div>
+    <div class="field"><span>Tipo de lista</span>
+      <div class="segmented" data-list-type-toggle>
+        <button type="button" class="active" data-list-type="dinamica">Dinámica</button>
+        <button type="button" data-list-type="manual">Manual</button>
+      </div>
+    </div>
+    <div data-list-dynamic>
+      <p class="muted-p" style="margin:-4px 0 12px">Se actualiza sola: agrega o quita clientes automáticamente según la condición.</p>
+      <div data-list-rules>
+        <div class="list-rule-row">
+          ${field('Fuente', select(['Segmento', 'Etapa de pipeline'], 'data-rule-source'))}
+          ${field('Valor', select(Object.keys(SEGMENT_TONES), 'data-rule-value'))}
+          <button type="button" class="icon-btn list-rule-remove" title="Quitar condición" aria-label="Quitar condición">${iconSvg('trash')}</button>
+        </div>
+      </div>
+      <button type="button" class="btn ghost" data-add-rule>+ Agregar condición</button>
+      <div class="list-rule-preview" data-rule-preview>≈ 214 clientes coinciden</div>
+    </div>
+    <div class="hidden" data-list-manual>
+      <div class="empty-state">Esta lista empieza vacía. Después de crearla, agrega clientes desde <strong>Clientes → Seleccionar → Agregar a lista</strong>.</div>
+    </div>
+    ${btn('Crear lista', 'primary', 'data-toast="Lista creada" data-toast-type="success" data-close-modal')}
+  `)}
+  ${addToListModal}
 `);
 
 const catalog = layout('Catálogo', 'catalog', `
@@ -1157,6 +1319,8 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .btn:active{transform:scale(.98)}
 .btn.secondary{background:var(--overlay-fill);color:var(--text);border:1px solid var(--overlay-border);box-shadow:none}
 .btn.secondary:hover{background:var(--overlay-fill-hover);border-color:var(--accent-soft-2)}
+.btn.danger{background:var(--danger);box-shadow:0 8px 20px -8px rgba(255,90,90,.5)}
+.btn:disabled{opacity:.5;cursor:default;pointer-events:none}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--border);box-shadow:none}
 .btn.ghost:hover{color:var(--text);border-color:var(--accent-soft-2)}
 .btn.ghost-light{background:rgba(255,255,255,.14);color:#fff;box-shadow:none}
@@ -1176,6 +1340,9 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .filter-panel.open{display:block}
 .filter-row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
 .field{display:flex;flex-direction:column;gap:6px;min-width:160px;flex:1}
+.list-rule-row{display:flex;gap:10px;align-items:flex-end;margin-bottom:10px}
+.list-rule-remove{flex-shrink:0}
+.list-rule-preview{margin-top:12px;font:600 12.5px var(--font-body);color:var(--accent);background:var(--accent-soft);border-radius:var(--r-s);padding:9px 13px;display:inline-block}
 .field span,.field>label,label.field span{font-size:12px;font-weight:600;color:var(--muted)}
 .input,.select,.textarea,.filter-input,.sort-select,.rows-select{border:1px solid var(--border);border-radius:var(--r-s);background:var(--surface-2);color:var(--text);font:400 13.5px/1.4 var(--font-body);padding:9px 12px}
 .input:focus,.select:focus,.textarea:focus,.filter-input:focus,.sort-select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
@@ -1198,6 +1365,10 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .action-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
 .action-btn:not(:disabled):hover{background:var(--surface-2);color:var(--text)}
 .action-btn:disabled{cursor:not-allowed;opacity:.35}
+.bulk-col{display:none;width:34px}
+.data-table.bulk-active .bulk-col{display:table-cell}
+.bulk-col input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.bulk-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent-soft-2);border-radius:var(--r-m);padding:10px 16px;margin-bottom:12px;font:600 13px var(--font-body);color:var(--accent)}
 .table-wrap{position:relative;width:100%;overflow:auto;border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface)}
 .data-table{width:100%;border-collapse:collapse}
 .data-table thead{background:transparent}
@@ -1269,6 +1440,26 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .cpf-col li.no{color:var(--faint)}
 .cpf-col li.no::before{content:'';width:14px;height:14px;flex-shrink:0}
 @media(max-width:640px){.current-plan-head{flex-direction:column}.current-plan-head .header-actions{width:100%}}
+.channel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:16px}
+.channel-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:16px}
+.channel-icon{width:38px;height:38px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.channel-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+.channel-icon.messenger{background:#0084ff}
+.channel-icon.instagram{background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4)}
+.channel-icon.telegram{background:#26a5e4}
+.channel-icon.zoho{background:#e42527}
+.channel-icon.hubspot{background:#ff7a59}
+.channel-copy{display:flex;flex-direction:column;gap:2px}
+.channel-copy strong{font:700 13.5px var(--font-display);color:var(--text)}
+.channel-copy span{font:400 12px var(--font-body);color:var(--faint)}
+.channel-card .btn{width:100%}
+.payment-methods-list{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.payment-method-row{display:flex;align-items:center;gap:14px;border:1px solid var(--border);border-radius:var(--r-m);padding:14px 16px}
+.payment-method-icon{width:38px;height:38px;border-radius:var(--r-s);background:var(--surface-2);color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.payment-method-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+.payment-method-copy{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.payment-method-copy strong{font:700 13.5px var(--font-display);color:var(--text)}
+.payment-method-copy span{font:400 12px var(--font-body);color:var(--faint)}
 .push-card{background:var(--good-soft);color:var(--good);border:1px solid rgba(53,214,138,.28);border-radius:var(--r-s);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .push-card strong{display:inline-flex;align-items:center;gap:8px}
 .push-card svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
@@ -2030,13 +2221,27 @@ const uiUtilsJs = `(function(){
         secretToggle.title = showing ? 'Mostrar' : 'Ocultar';
       }
     }
+    var langBtn = e.target.closest('[data-set-language]');
+    if(langBtn){
+      var code = langBtn.getAttribute('data-set-language');
+      var label = code === 'EN' ? 'English' : 'Español';
+      document.querySelectorAll('.language-selector').forEach(function(sel){
+        var codeEl = sel.querySelector('span');
+        var labelEl = sel.querySelector('strong');
+        if(codeEl) codeEl.textContent = code;
+        if(labelEl) labelEl.textContent = label;
+      });
+      var panel = langBtn.closest('.dropdown-panel');
+      if(panel) panel.classList.remove('open');
+      showToast('Idioma cambiado a ' + label, 'success');
+    }
   });
 
   document.querySelectorAll('[data-secret-toggle]').forEach(function(b){b.innerHTML=EYE_ICON;});
 })();`;
 
 const massiveJs = `(function(){
-  var listCounts = ${JSON.stringify(LIST_COUNTS)};
+  var listCounts = ${JSON.stringify(Object.fromEntries(MASSIVE_LISTS.map(l => [l.name, l.count])))};
   var page = document.querySelector('.massive-page');
   if(!page) return;
   var sendBtn = document.querySelector('.massive-form [data-send-campaign]');
@@ -2072,12 +2277,106 @@ const massiveJs = `(function(){
   }
 })();`;
 
+const listBuilderJs = `(function(){
+  var SEGMENT_VALUES = ${JSON.stringify(Object.keys(SEGMENT_TONES))};
+  var PIPELINE_VALUES = ${JSON.stringify(PIPELINE_STAGES.map(s => s.label))};
+  var SEGMENT_COUNTS = ${JSON.stringify(LIST_COUNTS)};
+  var PIPELINE_COUNTS = ${JSON.stringify(Object.fromEntries(PIPELINE_STAGES.map(s => [s.label, PIPELINE_DEALS.filter(d => d.stage === s.key).length])))};
+  var listModal = document.getElementById('list-modal');
+  if(listModal){
+    var typeToggle = listModal.querySelector('[data-list-type-toggle]');
+    var dynamicBlock = listModal.querySelector('[data-list-dynamic]');
+    var manualBlock = listModal.querySelector('[data-list-manual]');
+    var rulesWrap = listModal.querySelector('[data-list-rules]');
+    var preview = listModal.querySelector('[data-rule-preview]');
+    function valuesFor(source){ return source === 'Etapa de pipeline' ? PIPELINE_VALUES : SEGMENT_VALUES; }
+    function countFor(source, value){ return (source === 'Etapa de pipeline' ? PIPELINE_COUNTS : SEGMENT_COUNTS)[value] || 0; }
+    function refreshValueSelect(row){
+      var sourceSel = row.querySelector('[data-rule-source]');
+      var valueSel = row.querySelector('[data-rule-value]');
+      if(!sourceSel || !valueSel) return;
+      var vals = valuesFor(sourceSel.value);
+      valueSel.innerHTML = vals.map(function(v){ return '<option>'+v+'</option>'; }).join('');
+    }
+    function updatePreview(){
+      var rows = rulesWrap.querySelectorAll('.list-rule-row');
+      var total = 0;
+      rows.forEach(function(row){
+        var sourceSel = row.querySelector('[data-rule-source]');
+        var valueSel = row.querySelector('[data-rule-value]');
+        if(sourceSel && valueSel) total += countFor(sourceSel.value, valueSel.value);
+      });
+      if(preview) preview.textContent = '≈ ' + total + ' cliente' + (total === 1 ? '' : 's') + ' coinciden';
+    }
+    if(typeToggle){
+      typeToggle.addEventListener('click', function(e){
+        var b = e.target.closest('[data-list-type]');
+        if(!b) return;
+        typeToggle.querySelectorAll('button').forEach(function(btn){ btn.classList.toggle('active', btn === b); });
+        var isDynamic = b.dataset.listType === 'dinamica';
+        if(dynamicBlock) dynamicBlock.classList.toggle('hidden', !isDynamic);
+        if(manualBlock) manualBlock.classList.toggle('hidden', isDynamic);
+      });
+    }
+    if(rulesWrap){
+      rulesWrap.addEventListener('change', function(e){
+        var row = e.target.closest('.list-rule-row');
+        if(!row) return;
+        if(e.target.matches('[data-rule-source]')) refreshValueSelect(row);
+        updatePreview();
+      });
+    }
+    var addRuleBtn = listModal.querySelector('[data-add-rule]');
+    if(addRuleBtn){
+      addRuleBtn.addEventListener('click', function(){
+        var rows = rulesWrap.querySelectorAll('.list-rule-row');
+        var clone = rows[rows.length - 1].cloneNode(true);
+        rulesWrap.appendChild(clone);
+        updatePreview();
+      });
+    }
+    listModal.addEventListener('click', function(e){
+      var removeBtn = e.target.closest('.list-rule-remove');
+      if(!removeBtn) return;
+      var rows = rulesWrap.querySelectorAll('.list-rule-row');
+      if(rows.length > 1){ removeBtn.closest('.list-rule-row').remove(); updatePreview(); }
+    });
+    updatePreview();
+  }
+  var addListModal = document.getElementById('add-to-list-modal');
+  var selectedCount = 0;
+  document.addEventListener('click', function(e){
+    var trigger = e.target.closest('[data-bulk-add-list]');
+    if(trigger){
+      var table = trigger.closest('[data-bulk-table]');
+      selectedCount = table ? table.querySelectorAll('[data-bulk-row]:checked').length : 0;
+      var countLabel = addListModal && addListModal.querySelector('[data-add-list-count]');
+      if(countLabel) countLabel.textContent = 'Agregar ' + selectedCount + ' cliente' + (selectedCount === 1 ? '' : 's') + ' seleccionado' + (selectedCount === 1 ? '' : 's') + ' a una lista manual.';
+      return;
+    }
+    var confirmBtn = e.target.closest('[data-confirm-add-list]');
+    if(confirmBtn && addListModal){
+      var select = addListModal.querySelector('[data-add-list-select]');
+      var newNameInput = addListModal.querySelector('[data-add-list-new-name]');
+      var listName = select && select.value === '__new__' ? ((newNameInput && newNameInput.value.trim()) || 'Nueva lista') : (select ? select.value : '');
+      addListModal.classList.remove('open');
+      if(window.HBToast) window.HBToast(selectedCount + ' cliente' + (selectedCount === 1 ? '' : 's') + ' agregado' + (selectedCount === 1 ? '' : 's') + ' a "' + listName + '"', 'success');
+    }
+  });
+  document.addEventListener('change', function(e){
+    var select = e.target.closest('[data-add-list-select]');
+    if(!select || !addListModal) return;
+    var newField = addListModal.querySelector('[data-add-list-new]');
+    if(newField) newField.classList.toggle('hidden', select.value !== '__new__');
+  });
+})();`;
+
 const deleteConfirmJs = `(function(){
   document.addEventListener('click',function(e){
     var delBtn = e.target.closest('.row-action-btn.danger, .delete-chip');
     if(!delBtn || delBtn.hasAttribute('data-no-confirm')) return;
     e.preventDefault();
-    var container = delBtn.closest('tr, .real-bot-card, .media-card, .cuenta-card');
+    var container = delBtn.closest('tr, .real-bot-card, .media-card, .cuenta-card, .payment-method-row');
     var label = '';
     if(container){
       var nameEl = container.querySelector('.strong-text, strong');
@@ -2316,7 +2615,120 @@ const planSwitchJs = `(function(){
     });
   });
 })();`;
-const finalJs = js + responsiveJs + themeToggleJs + segmentModalJs + calendarDragJs + calendarViewsJs + uiUtilsJs + massiveJs + deleteConfirmJs + chatContextJs + pipelineJs + planSwitchJs;
+const bulkSelectJs = `(function(){
+  function getTable(el){ return el.closest('[data-bulk-table]'); }
+  function updateBar(table){
+    var checks = table.querySelectorAll('[data-bulk-row]');
+    var checked = table.querySelectorAll('[data-bulk-row]:checked');
+    var allBox = table.querySelector('[data-bulk-all]');
+    var countEl = table.querySelector('[data-bulk-count]');
+    var delBtn = table.querySelector('[data-bulk-delete]');
+    var extraBtns = table.querySelectorAll('[data-bulk-extra]');
+    if(countEl) countEl.textContent = checked.length + ' seleccionado' + (checked.length === 1 ? '' : 's');
+    if(delBtn) delBtn.disabled = checked.length === 0;
+    extraBtns.forEach(function(b){ b.disabled = checked.length === 0; });
+    if(allBox){
+      allBox.checked = checks.length > 0 && checked.length === checks.length;
+      allBox.indeterminate = checked.length > 0 && checked.length < checks.length;
+    }
+  }
+  function setMode(table, active){
+    table.classList.toggle('bulk-mode', active);
+    var bar = table.querySelector('[data-bulk-bar]');
+    var dataTableEl = table.querySelector('table.data-table');
+    if(bar) bar.classList.toggle('hidden', !active);
+    if(dataTableEl) dataTableEl.classList.toggle('bulk-active', active);
+    var toggleBtn = table.querySelector('[data-bulk-toggle]');
+    if(toggleBtn) toggleBtn.textContent = active ? 'Cancelar selección' : 'Seleccionar';
+    if(!active){
+      table.querySelectorAll('[data-bulk-row], [data-bulk-all]').forEach(function(cb){ cb.checked = false; cb.indeterminate = false; });
+      updateBar(table);
+    }
+  }
+  document.addEventListener('click', function(e){
+    var toggleBtn = e.target.closest('[data-bulk-toggle]');
+    if(toggleBtn){
+      var table = getTable(toggleBtn);
+      if(table) setMode(table, !table.classList.contains('bulk-mode'));
+      return;
+    }
+    var cancelBtn = e.target.closest('[data-bulk-cancel]');
+    if(cancelBtn){
+      var table2 = getTable(cancelBtn);
+      if(table2) setMode(table2, false);
+      return;
+    }
+    var delBtn = e.target.closest('[data-bulk-delete]');
+    if(delBtn){
+      if(delBtn.disabled || !window.HBConfirm) return;
+      var table3 = getTable(delBtn);
+      if(!table3) return;
+      var checkedRows = Array.prototype.map.call(table3.querySelectorAll('[data-bulk-row]:checked'), function(cb){ return cb.closest('tr'); });
+      if(!checkedRows.length) return;
+      var n = checkedRows.length;
+      window.HBConfirm({
+        title: '¿Eliminar ' + n + ' elemento' + (n === 1 ? '' : 's') + '?',
+        message: 'Esta acción no se puede deshacer.',
+        onAccept: function(){
+          checkedRows.forEach(function(tr){
+            tr.style.transition = 'opacity .2s ease, transform .2s ease';
+            tr.style.opacity = '0';
+            tr.style.transform = 'scale(.97)';
+            setTimeout(function(){ tr.remove(); }, 200);
+          });
+          if(window.HBToast) window.HBToast(n + ' elemento' + (n === 1 ? '' : 's') + ' eliminado' + (n === 1 ? '' : 's'), 'success');
+          setTimeout(function(){ updateBar(table3); }, 210);
+        }
+      });
+    }
+  });
+  document.addEventListener('change', function(e){
+    var allBox = e.target.closest('[data-bulk-all]');
+    if(allBox){
+      var table = getTable(allBox);
+      if(!table) return;
+      table.querySelectorAll('[data-bulk-row]').forEach(function(cb){ cb.checked = allBox.checked; });
+      updateBar(table);
+      return;
+    }
+    var rowBox = e.target.closest('[data-bulk-row]');
+    if(rowBox){
+      var table2 = getTable(rowBox);
+      if(table2) updateBar(table2);
+    }
+  });
+})();`;
+const settingsExtrasJs = `(function(){
+  document.addEventListener('click', function(e){
+    var toggle = e.target.closest('[data-payment-type-toggle] button');
+    if(toggle){
+      var group = toggle.closest('[data-payment-type-toggle]');
+      group.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b === toggle); });
+      var modal = toggle.closest('.modal-card');
+      if(modal){
+        var isCard = toggle.dataset.paymentType === 'tarjeta';
+        var cardBlock = modal.querySelector('[data-payment-card]');
+        var transferBlock = modal.querySelector('[data-payment-transfer]');
+        if(cardBlock) cardBlock.classList.toggle('hidden', !isCard);
+        if(transferBlock) transferBlock.classList.toggle('hidden', isCard);
+      }
+      return;
+    }
+    var connectBtn = e.target.closest('[data-close-modal][data-toast]');
+    if(connectBtn){
+      var modalLayer = connectBtn.closest('.modal-layer');
+      if(!modalLayer) return;
+      var opener = document.querySelector('[data-open-modal="#' + modalLayer.id + '"]');
+      var card = opener && opener.closest('.channel-card');
+      if(card){
+        var pill = card.querySelector('.pill');
+        if(pill){ pill.textContent = 'Conectado'; pill.className = 'pill success'; }
+        opener.textContent = 'Configurar';
+      }
+    }
+  });
+})();`;
+const finalJs = js + responsiveJs + themeToggleJs + segmentModalJs + calendarDragJs + calendarViewsJs + uiUtilsJs + massiveJs + listBuilderJs + deleteConfirmJs + chatContextJs + pipelineJs + planSwitchJs + bulkSelectJs + settingsExtrasJs;
 const inlinePage = (html) => html
   .replace('<link rel="stylesheet" href="wireframes.css">', `<style>${finalCss}</style>`)
   .replace('<script src="wireframes.js"></script>', `<script>${finalJs}</script>`);
