@@ -375,10 +375,27 @@ const botCard = (name, active = true) => `
       </div>
     </div>
   </article>`;
-const chatClient = (name, phone, last, time, initials, active = false, unread = '') => `
+const CHANNEL_META = {
+  whatsapp: { label: 'WhatsApp', icon: 'chat' },
+  instagram: { label: 'Instagram', icon: 'photo' },
+  messenger: { label: 'Messenger', icon: 'chat' },
+  telegram: { label: 'Telegram', icon: 'send' },
+  linkedin: { label: 'LinkedIn', icon: 'clients' },
+  tiktok: { label: 'TikTok', icon: 'chat' },
+  sms: { label: 'SMS', icon: 'chat' },
+};
+const channelBadge = (channel) => {
+  const m = CHANNEL_META[channel] || CHANNEL_META.whatsapp;
+  return `<span class="channel-badge ${channel}" title="${m.label}">${iconSvg(m.icon)}</span>`;
+};
+const channelChip = (channel) => {
+  const m = CHANNEL_META[channel] || CHANNEL_META.whatsapp;
+  return `<span class="channel-chip ${channel}">${iconSvg(m.icon)} ${m.label}</span>`;
+};
+const chatClient = (name, phone, last, time, initials, active = false, unread = '', channel = 'whatsapp') => `
   <div class="client-line">
     <button class="real-client-item ${active ? 'active' : ''}" type="button">
-      <span class="client-avatar">${initials}</span>
+      <span class="avatar-wrap"><span class="client-avatar">${initials}</span>${channelBadge(channel)}</span>
       <span class="client-copy"><strong>${name}</strong><small>${last}</small></span>
       <span class="client-meta"><time>${time}</time>${unread ? `<b>${unread}</b>` : ''}</span>
     </button>
@@ -695,20 +712,20 @@ const chat = layout('Chat', 'chat', `
       <aside class="conversation-list real-conversation-list">
         <label class="real-search"><span>${iconSvg('search')}</span><input placeholder="Buscar clientes..."></label>
         <div class="client-scroll">
-          ${chatClient('Juan Carlos Garcia','573212345467','Quiero saber si tienen disponible la Tina Eléctrica Pedicure.','10:34','JG',true,'3')}
-          ${chatClient('Yanidy Miranda','573216236735','Cotización pendiente para el combo pedicure.','Ayer','YM',false,'1')}
-          ${chatClient('Aleja Nails','573142135346','Nuevo pedido detectado desde catálogo.','Lun','AN')}
-          ${chatClient('Laura Vanessa','573205551200','Gracias, quedo atenta al envío.','Dom','LV')}
-          ${chatClient('Tatiana Ruiz','573187774433','¿El pago puede ser contra entrega?','Sáb','TR','')}
-          ${chatClient('Diana Paola','573003332211','Necesito el catálogo actualizado.','Vie','DP')}
+          ${chatClient('Juan Carlos Garcia','573212345467','Quiero saber si tienen disponible la Tina Eléctrica Pedicure.','10:34','JG',true,'3','whatsapp')}
+          ${chatClient('Yanidy Miranda','573216236735','Cotización pendiente para el combo pedicure.','Ayer','YM',false,'1','instagram')}
+          ${chatClient('Aleja Nails','573142135346','Nuevo pedido detectado desde catálogo.','Lun','AN',false,'','whatsapp')}
+          ${chatClient('Laura Vanessa','573205551200','Gracias, quedo atenta al envío.','Dom','LV',false,'','messenger')}
+          ${chatClient('Tatiana Ruiz','573187774433','¿El pago puede ser contra entrega?','Sáb','TR',false,'','whatsapp')}
+          ${chatClient('Diana Paola','573003332211','Necesito el catálogo actualizado.','Vie','DP',false,'','telegram')}
         </div>
       </aside>
       <section class="chat-panel real-chat-panel">
         <header class="chat-header real-chat-header">
           <div class="chat-head-row">
             <button class="chat-icon-btn" type="button" data-chat-back>${iconSvg('chevronLeft')}</button>
-            <span class="chat-avatar">JG</span>
-            <div class="chat-person"><strong>Juan Carlos Garcia</strong><span>+573212345467</span></div>
+            <span class="avatar-wrap"><span class="chat-avatar">JG</span>${channelBadge('whatsapp')}</span>
+            <div class="chat-person"><strong>Juan Carlos Garcia</strong><span>+573212345467 · vía WhatsApp</span></div>
           </div>
           <button class="chat-icon-btn chat-context-toggle" type="button" data-toggle-class="open" data-target="#chat-context" aria-label="Ver información del cliente" title="Información del cliente">${iconSvg('list')}</button>
         </header>
@@ -734,6 +751,15 @@ const chat = layout('Chat', 'chat', `
           <span class="chat-context-avatar">JG</span>
           <strong>Juan Carlos Garcia</strong>
           <span>+573212345467</span>
+        </div>
+        <div class="chat-context-section">
+          <h4>Canales vinculados</h4>
+          <div class="chat-context-channels">
+            ${channelChip('whatsapp')}
+            ${channelChip('instagram')}
+            <button type="button" class="chat-segments-add" title="Vincular canal" aria-label="Vincular canal">+</button>
+          </div>
+          <p class="muted-p" style="margin:8px 0 0;font-size:11.5px">Un solo cliente, un solo registro: cada canal se vincula a esta misma ficha, no crea un contacto nuevo.</p>
         </div>
         <div class="chat-context-section">
           <h4>Segmentos</h4>
@@ -913,20 +939,16 @@ const settings = layout('Configuración', 'settings', `
       </div>
 
       <div class="hidden" data-tab-panel="canales">
-        <section class="settings-section"><h2>WhatsApp</h2><p class="muted-p">Credenciales de conexión con la API de WhatsApp Business. Se muestran ocultas por seguridad.</p>
-          <div class="form-grid">
-            ${secretField('Clave API WhatsApp', 'Ingresa la clave API WhatsApp', 'wa-key')}
-            ${field('ID de teléfono WhatsApp', input('placeholder="Ingresa el ID de teléfono WhatsApp"'))}
-            ${field('ID de cuenta WhatsApp Business', input('placeholder="Ingresa el ID de cuenta WhatsApp Business"'))}
-            ${field('URL base WhatsApp', input('placeholder="Ingresa la URL base WhatsApp"'))}
-            ${secretField('Token de Verificación del Hub', 'Ingresa el token de verificación', 'wa-hub-token')}
-          </div>
-          <div class="top-space">${btn('Generar token Hub','secondary','data-generate="wa-hub-token" data-toast="Token del Hub generado" data-toast-type="success"')}</div>
-        </section>
         <section class="settings-section">
-          <h2>Otros canales</h2>
-          <p class="muted-p">Conecta canales adicionales para atender a tus clientes desde un solo lugar, sin salir de HalconBot.</p>
+          <h2>Canales de mensajería</h2>
+          <p class="muted-p">Conecta los canales donde tus clientes ya te escriben, todos desde un solo lugar, sin salir de HalconBot.</p>
           <div class="channel-grid">
+            <div class="channel-card">
+              <span class="channel-icon whatsapp">${iconSvg('chat')}</span>
+              <div class="channel-copy"><strong>WhatsApp</strong><span>WhatsApp Business API</span></div>
+              ${status('Conectado', 'success')}
+              <button class="btn secondary" type="button" data-open-modal="#whatsapp-modal">Configurar</button>
+            </div>
             <div class="channel-card">
               <span class="channel-icon messenger">${iconSvg('chat')}</span>
               <div class="channel-copy"><strong>Messenger</strong><span>Meta Business · Facebook</span></div>
@@ -944,6 +966,24 @@ const settings = layout('Configuración', 'settings', `
               <div class="channel-copy"><strong>Telegram</strong><span>Bot de Telegram</span></div>
               ${status('No conectado', 'neutral')}
               <button class="btn secondary" type="button" data-open-modal="#telegram-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon linkedin">${iconSvg('clients')}</span>
+              <div class="channel-copy"><strong>LinkedIn</strong><span>Mensajes de LinkedIn Company Page</span></div>
+              ${status('No conectado', 'neutral')}
+              <button class="btn secondary" type="button" data-open-modal="#linkedin-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon tiktok">${iconSvg('chat')}</span>
+              <div class="channel-copy"><strong>TikTok</strong><span>TikTok Business Messaging</span></div>
+              ${status('No conectado', 'neutral')}
+              <button class="btn secondary" type="button" data-open-modal="#tiktok-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon sms">${iconSvg('chat')}</span>
+              <div class="channel-copy"><strong>SMS</strong><span>Recordatorios y respaldo sin WhatsApp</span></div>
+              ${status('No conectado', 'neutral')}
+              <button class="btn secondary" type="button" data-open-modal="#sms-modal">Conectar</button>
             </div>
           </div>
         </section>
@@ -1000,9 +1040,13 @@ const settings = layout('Configuración', 'settings', `
         </section>
       </div>
   </div>
+  ${modal('whatsapp-modal', 'Configurar WhatsApp', `<p class="muted-p" style="margin-top:-4px">Credenciales de conexión con la API de WhatsApp Business. Se muestran ocultas por seguridad.</p><div class="form-grid">${secretField('Clave API WhatsApp', 'Ingresa la clave API WhatsApp', 'wa-key')}${field('ID de teléfono WhatsApp', input('placeholder="Ingresa el ID de teléfono WhatsApp"'))}${field('ID de cuenta WhatsApp Business', input('placeholder="Ingresa el ID de cuenta WhatsApp Business"'))}${field('URL base WhatsApp', input('placeholder="Ingresa la URL base WhatsApp"'))}${secretField('Token de Verificación del Hub', 'Ingresa el token de verificación', 'wa-hub-token')}</div><div class="header-actions top-space">${btn('Generar token Hub','secondary','data-generate="wa-hub-token" data-toast="Token del Hub generado" data-toast-type="success"')}${btn('Guardar', 'primary', 'data-toast="WhatsApp actualizado" data-toast-type="success" data-close-modal')}</div>`)}
   ${modal('messenger-modal', 'Conectar Messenger', `<p class="muted-p" style="margin-top:-4px">Encuentra estas credenciales en Meta for Developers → tu App → Messenger → Configuración.</p><div class="form-grid">${secretField('Token de acceso de la página', 'Ingresa el token de la página', 'messenger-token')}${field('ID de la página de Facebook', input('placeholder="Ingresa el ID de la página"'))}${secretField('App Secret', 'Ingresa el App Secret', 'messenger-secret')}</div>${btn('Conectar', 'primary', 'data-toast="Messenger conectado" data-toast-type="success" data-close-modal')}`)}
   ${modal('instagram-modal', 'Conectar Instagram', `<p class="muted-p" style="margin-top:-4px">Tu cuenta de Instagram debe ser una cuenta profesional vinculada a una página de Facebook.</p><div class="form-grid">${field('ID de cuenta de Instagram Business', input('placeholder="Ingresa el ID de la cuenta"'))}${secretField('Token de acceso', 'Ingresa el token de acceso', 'instagram-token')}</div>${btn('Conectar', 'primary', 'data-toast="Instagram conectado" data-toast-type="success" data-close-modal')}`)}
   ${modal('telegram-modal', 'Conectar Telegram', `<p class="muted-p" style="margin-top:-4px">Crea un bot con @BotFather en Telegram y pega aquí el token que te entrega.</p><div class="form-grid">${secretField('Token del bot', 'Ingresa el token del bot', 'telegram-token')}${field('Usuario del bot', input('placeholder="@tu_negocio_bot"'))}</div>${btn('Conectar', 'primary', 'data-toast="Telegram conectado" data-toast-type="success" data-close-modal')}`)}
+  ${modal('linkedin-modal', 'Conectar LinkedIn', `<p class="muted-p" style="margin-top:-4px">Encuentra estas credenciales en LinkedIn Developer Portal → tu App → Auth, sobre la página de tu empresa.</p><div class="form-grid">${secretField('Access Token', 'Ingresa el Access Token de LinkedIn', 'linkedin-token')}${field('ID de la página de empresa', input('placeholder="Ingresa el ID de la Company Page"'))}</div>${btn('Conectar', 'primary', 'data-toast="LinkedIn conectado" data-toast-type="success" data-close-modal')}`)}
+  ${modal('tiktok-modal', 'Conectar TikTok', `<div class="pipe-info-banner"><strong>Acceso limitado.</strong> La API de TikTok Business Messaging está en rollout restringido — confirma con tu representante de TikTok que tu cuenta ya tiene acceso antes de activar este canal.</div><p class="muted-p" style="margin-top:-4px">Encuentra estas credenciales en TikTok for Business → Developer Portal, sobre tu cuenta de negocio.</p><div class="form-grid">${secretField('Access Token', 'Ingresa el Access Token de TikTok', 'tiktok-token')}${field('ID de la cuenta de negocio', input('placeholder="Ingresa el TikTok Business ID"'))}</div>${btn('Conectar', 'primary', 'data-toast="TikTok conectado" data-toast-type="success" data-close-modal')}`)}
+  ${modal('sms-modal', 'Conectar SMS', `<p class="muted-p" style="margin-top:-4px">Úsalo como respaldo cuando un cliente no tiene WhatsApp, o para recordatorios de cita y pago que necesitan llegar sí o sí.</p><div class="form-grid">${field('Proveedor', select(['Twilio', 'LabsMobile', 'Infobip']))}${secretField('API Key', 'Ingresa la API Key del proveedor', 'sms-key')}${field('Remitente (Sender ID)', input('placeholder="Ej. HALCONBOT o un número"'))}</div>${btn('Conectar', 'primary', 'data-toast="SMS conectado" data-toast-type="success" data-close-modal')}`)}
   ${modal('zoho-modal', 'Conectar Zoho CRM', `<p class="muted-p" style="margin-top:-4px">Encuentra estas credenciales en Zoho API Console → Server-based Applications.</p><div class="form-grid">${secretField('Client ID', 'Ingresa el Client ID de Zoho', 'zoho-client-id')}${secretField('Client Secret', 'Ingresa el Client Secret de Zoho', 'zoho-client-secret')}${field('Región del centro de datos', select(['.com (EE. UU.)', '.eu (Europa)', '.in (India)', '.com.au (Australia)']))}</div>${btn('Conectar', 'primary', 'data-toast="Zoho CRM conectado" data-toast-type="success" data-close-modal')}`)}
   ${modal('hubspot-modal', 'Conectar HubSpot', `<p class="muted-p" style="margin-top:-4px">Genera un token privado en HubSpot → Configuración → Integraciones → Apps privadas.</p><div class="form-grid">${secretField('Token de acceso privado', 'Ingresa el token de HubSpot', 'hubspot-token')}${field('Portal ID', input('placeholder="Ej. 12345678"'))}</div>${btn('Conectar', 'primary', 'data-toast="HubSpot conectado" data-toast-type="success" data-close-modal')}`)}
   ${paymentMethodModal}
@@ -1444,9 +1488,35 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .channel-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:16px}
 .channel-icon{width:38px;height:38px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
 .channel-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
-.channel-icon.messenger{background:#0084ff}
-.channel-icon.instagram{background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4)}
-.channel-icon.telegram{background:#26a5e4}
+:root{--ch-whatsapp:#25d366;--ch-messenger:#0084ff;--ch-instagram:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4);--ch-telegram:#26a5e4;--ch-linkedin:#0a66c2;--ch-tiktok:#000;--ch-sms:#ff7a00}
+.channel-icon.whatsapp{background:var(--ch-whatsapp)}
+.channel-icon.messenger{background:var(--ch-messenger)}
+.channel-icon.instagram{background:var(--ch-instagram)}
+.channel-icon.telegram{background:var(--ch-telegram)}
+.channel-icon.linkedin{background:var(--ch-linkedin)}
+.channel-icon.tiktok{background:var(--ch-tiktok)}
+.channel-icon.sms{background:var(--ch-sms)}
+.channel-badge{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;border:2px solid var(--surface);flex-shrink:0}
+.channel-badge svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2.4}
+.channel-badge.whatsapp{background:var(--ch-whatsapp)}
+.channel-badge.messenger{background:var(--ch-messenger)}
+.channel-badge.instagram{background:var(--ch-instagram)}
+.channel-badge.telegram{background:var(--ch-telegram)}
+.channel-badge.linkedin{background:var(--ch-linkedin)}
+.channel-badge.tiktok{background:var(--ch-tiktok)}
+.channel-badge.sms{background:var(--ch-sms)}
+.avatar-wrap{position:relative;display:inline-flex;flex-shrink:0}
+.avatar-wrap .channel-badge{position:absolute;right:-2px;bottom:-2px}
+.channel-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font:700 11.5px/1 var(--font-body);color:#fff}
+.channel-chip svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2}
+.channel-chip.whatsapp{background:var(--ch-whatsapp)}
+.channel-chip.messenger{background:var(--ch-messenger)}
+.channel-chip.instagram{background:var(--ch-instagram)}
+.channel-chip.telegram{background:var(--ch-telegram)}
+.channel-chip.linkedin{background:var(--ch-linkedin)}
+.channel-chip.tiktok{background:var(--ch-tiktok)}
+.channel-chip.sms{background:var(--ch-sms)}
+.chat-context-channels{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .channel-icon.zoho{background:#e42527}
 .channel-icon.hubspot{background:#ff7a59}
 .channel-copy{display:flex;flex-direction:column;gap:2px}

@@ -238,9 +238,35 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .channel-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:16px}
 .channel-icon{width:38px;height:38px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
 .channel-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
-.channel-icon.messenger{background:#0084ff}
-.channel-icon.instagram{background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4)}
-.channel-icon.telegram{background:#26a5e4}
+:root{--ch-whatsapp:#25d366;--ch-messenger:#0084ff;--ch-instagram:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4);--ch-telegram:#26a5e4;--ch-linkedin:#0a66c2;--ch-tiktok:#000;--ch-sms:#ff7a00}
+.channel-icon.whatsapp{background:var(--ch-whatsapp)}
+.channel-icon.messenger{background:var(--ch-messenger)}
+.channel-icon.instagram{background:var(--ch-instagram)}
+.channel-icon.telegram{background:var(--ch-telegram)}
+.channel-icon.linkedin{background:var(--ch-linkedin)}
+.channel-icon.tiktok{background:var(--ch-tiktok)}
+.channel-icon.sms{background:var(--ch-sms)}
+.channel-badge{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;border:2px solid var(--surface);flex-shrink:0}
+.channel-badge svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2.4}
+.channel-badge.whatsapp{background:var(--ch-whatsapp)}
+.channel-badge.messenger{background:var(--ch-messenger)}
+.channel-badge.instagram{background:var(--ch-instagram)}
+.channel-badge.telegram{background:var(--ch-telegram)}
+.channel-badge.linkedin{background:var(--ch-linkedin)}
+.channel-badge.tiktok{background:var(--ch-tiktok)}
+.channel-badge.sms{background:var(--ch-sms)}
+.avatar-wrap{position:relative;display:inline-flex;flex-shrink:0}
+.avatar-wrap .channel-badge{position:absolute;right:-2px;bottom:-2px}
+.channel-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font:700 11.5px/1 var(--font-body);color:#fff}
+.channel-chip svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2}
+.channel-chip.whatsapp{background:var(--ch-whatsapp)}
+.channel-chip.messenger{background:var(--ch-messenger)}
+.channel-chip.instagram{background:var(--ch-instagram)}
+.channel-chip.telegram{background:var(--ch-telegram)}
+.channel-chip.linkedin{background:var(--ch-linkedin)}
+.channel-chip.tiktok{background:var(--ch-tiktok)}
+.channel-chip.sms{background:var(--ch-sms)}
+.chat-context-channels{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .channel-icon.zoho{background:#e42527}
 .channel-icon.hubspot{background:#ff7a59}
 .channel-copy{display:flex;flex-direction:column;gap:2px}
@@ -777,32 +803,16 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
       </div>
 
       <div class="hidden" data-tab-panel="canales">
-        <section class="settings-section"><h2>WhatsApp</h2><p class="muted-p">Credenciales de conexión con la API de WhatsApp Business. Se muestran ocultas por seguridad.</p>
-          <div class="form-grid">
-            <div class="field">
-  <span>Clave API WhatsApp</span>
-  <div class="secret-input-wrap">
-    <input class="input" type="password" placeholder="Ingresa la clave API WhatsApp" id="wa-key" data-secret-input>
-    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-  </div>
-</div>
-            <label class="field"><span>ID de teléfono WhatsApp</span><input class="input" placeholder="Ingresa el ID de teléfono WhatsApp"></label>
-            <label class="field"><span>ID de cuenta WhatsApp Business</span><input class="input" placeholder="Ingresa el ID de cuenta WhatsApp Business"></label>
-            <label class="field"><span>URL base WhatsApp</span><input class="input" placeholder="Ingresa la URL base WhatsApp"></label>
-            <div class="field">
-  <span>Token de Verificación del Hub</span>
-  <div class="secret-input-wrap">
-    <input class="input" type="password" placeholder="Ingresa el token de verificación" id="wa-hub-token" data-secret-input>
-    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-  </div>
-</div>
-          </div>
-          <div class="top-space"><button class="btn secondary" type="button" data-generate="wa-hub-token" data-toast="Token del Hub generado" data-toast-type="success">Generar token Hub</button></div>
-        </section>
         <section class="settings-section">
-          <h2>Otros canales</h2>
-          <p class="muted-p">Conecta canales adicionales para atender a tus clientes desde un solo lugar, sin salir de HalconBot.</p>
+          <h2>Canales de mensajería</h2>
+          <p class="muted-p">Conecta los canales donde tus clientes ya te escriben, todos desde un solo lugar, sin salir de HalconBot.</p>
           <div class="channel-grid">
+            <div class="channel-card">
+              <span class="channel-icon whatsapp"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg></span>
+              <div class="channel-copy"><strong>WhatsApp</strong><span>WhatsApp Business API</span></div>
+              <span class="pill success">Conectado</span>
+              <button class="btn secondary" type="button" data-open-modal="#whatsapp-modal">Configurar</button>
+            </div>
             <div class="channel-card">
               <span class="channel-icon messenger"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg></span>
               <div class="channel-copy"><strong>Messenger</strong><span>Meta Business · Facebook</span></div>
@@ -820,6 +830,24 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
               <div class="channel-copy"><strong>Telegram</strong><span>Bot de Telegram</span></div>
               <span class="pill neutral">No conectado</span>
               <button class="btn secondary" type="button" data-open-modal="#telegram-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon linkedin"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+              <div class="channel-copy"><strong>LinkedIn</strong><span>Mensajes de LinkedIn Company Page</span></div>
+              <span class="pill neutral">No conectado</span>
+              <button class="btn secondary" type="button" data-open-modal="#linkedin-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon tiktok"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg></span>
+              <div class="channel-copy"><strong>TikTok</strong><span>TikTok Business Messaging</span></div>
+              <span class="pill neutral">No conectado</span>
+              <button class="btn secondary" type="button" data-open-modal="#tiktok-modal">Conectar</button>
+            </div>
+            <div class="channel-card">
+              <span class="channel-icon sms"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg></span>
+              <div class="channel-copy"><strong>SMS</strong><span>Recordatorios y respaldo sin WhatsApp</span></div>
+              <span class="pill neutral">No conectado</span>
+              <button class="btn secondary" type="button" data-open-modal="#sms-modal">Conectar</button>
             </div>
           </div>
         </section>
@@ -979,6 +1007,25 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
       </div>
   </div>
   
+  <div class="modal-layer" id="whatsapp-modal" aria-hidden="true">
+    <div class="modal-card ">
+      <header class="modal-header"><h2>Configurar WhatsApp</h2><button type="button" class="modal-close" data-close-modal>×</button></header>
+      <div class="modal-body"><p class="muted-p" style="margin-top:-4px">Credenciales de conexión con la API de WhatsApp Business. Se muestran ocultas por seguridad.</p><div class="form-grid"><div class="field">
+  <span>Clave API WhatsApp</span>
+  <div class="secret-input-wrap">
+    <input class="input" type="password" placeholder="Ingresa la clave API WhatsApp" id="wa-key" data-secret-input>
+    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</div><label class="field"><span>ID de teléfono WhatsApp</span><input class="input" placeholder="Ingresa el ID de teléfono WhatsApp"></label><label class="field"><span>ID de cuenta WhatsApp Business</span><input class="input" placeholder="Ingresa el ID de cuenta WhatsApp Business"></label><label class="field"><span>URL base WhatsApp</span><input class="input" placeholder="Ingresa la URL base WhatsApp"></label><div class="field">
+  <span>Token de Verificación del Hub</span>
+  <div class="secret-input-wrap">
+    <input class="input" type="password" placeholder="Ingresa el token de verificación" id="wa-hub-token" data-secret-input>
+    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</div></div><div class="header-actions top-space"><button class="btn secondary" type="button" data-generate="wa-hub-token" data-toast="Token del Hub generado" data-toast-type="success">Generar token Hub</button><button class="btn primary" type="button" data-toast="WhatsApp actualizado" data-toast-type="success" data-close-modal>Guardar</button></div></div>
+    </div>
+  </div>
+  
   <div class="modal-layer" id="messenger-modal" aria-hidden="true">
     <div class="modal-card ">
       <header class="modal-header"><h2>Conectar Messenger</h2><button type="button" class="modal-close" data-close-modal>×</button></header>
@@ -1021,6 +1068,45 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
     <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
 </div><label class="field"><span>Usuario del bot</span><input class="input" placeholder="@tu_negocio_bot"></label></div><button class="btn primary" type="button" data-toast="Telegram conectado" data-toast-type="success" data-close-modal>Conectar</button></div>
+    </div>
+  </div>
+  
+  <div class="modal-layer" id="linkedin-modal" aria-hidden="true">
+    <div class="modal-card ">
+      <header class="modal-header"><h2>Conectar LinkedIn</h2><button type="button" class="modal-close" data-close-modal>×</button></header>
+      <div class="modal-body"><p class="muted-p" style="margin-top:-4px">Encuentra estas credenciales en LinkedIn Developer Portal → tu App → Auth, sobre la página de tu empresa.</p><div class="form-grid"><div class="field">
+  <span>Access Token</span>
+  <div class="secret-input-wrap">
+    <input class="input" type="password" placeholder="Ingresa el Access Token de LinkedIn" id="linkedin-token" data-secret-input>
+    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</div><label class="field"><span>ID de la página de empresa</span><input class="input" placeholder="Ingresa el ID de la Company Page"></label></div><button class="btn primary" type="button" data-toast="LinkedIn conectado" data-toast-type="success" data-close-modal>Conectar</button></div>
+    </div>
+  </div>
+  
+  <div class="modal-layer" id="tiktok-modal" aria-hidden="true">
+    <div class="modal-card ">
+      <header class="modal-header"><h2>Conectar TikTok</h2><button type="button" class="modal-close" data-close-modal>×</button></header>
+      <div class="modal-body"><div class="pipe-info-banner"><strong>Acceso limitado.</strong> La API de TikTok Business Messaging está en rollout restringido — confirma con tu representante de TikTok que tu cuenta ya tiene acceso antes de activar este canal.</div><p class="muted-p" style="margin-top:-4px">Encuentra estas credenciales en TikTok for Business → Developer Portal, sobre tu cuenta de negocio.</p><div class="form-grid"><div class="field">
+  <span>Access Token</span>
+  <div class="secret-input-wrap">
+    <input class="input" type="password" placeholder="Ingresa el Access Token de TikTok" id="tiktok-token" data-secret-input>
+    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</div><label class="field"><span>ID de la cuenta de negocio</span><input class="input" placeholder="Ingresa el TikTok Business ID"></label></div><button class="btn primary" type="button" data-toast="TikTok conectado" data-toast-type="success" data-close-modal>Conectar</button></div>
+    </div>
+  </div>
+  
+  <div class="modal-layer" id="sms-modal" aria-hidden="true">
+    <div class="modal-card ">
+      <header class="modal-header"><h2>Conectar SMS</h2><button type="button" class="modal-close" data-close-modal>×</button></header>
+      <div class="modal-body"><p class="muted-p" style="margin-top:-4px">Úsalo como respaldo cuando un cliente no tiene WhatsApp, o para recordatorios de cita y pago que necesitan llegar sí o sí.</p><div class="form-grid"><label class="field"><span>Proveedor</span><select class="select" ><option>Twilio</option><option>LabsMobile</option><option>Infobip</option></select></label><div class="field">
+  <span>API Key</span>
+  <div class="secret-input-wrap">
+    <input class="input" type="password" placeholder="Ingresa la API Key del proveedor" id="sms-key" data-secret-input>
+    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</div><label class="field"><span>Remitente (Sender ID)</span><input class="input" placeholder="Ej. HALCONBOT o un número"></label></div><button class="btn primary" type="button" data-toast="SMS conectado" data-toast-type="success" data-close-modal>Conectar</button></div>
     </div>
   </div>
   

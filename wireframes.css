@@ -228,9 +228,35 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .channel-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:16px}
 .channel-icon{width:38px;height:38px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
 .channel-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
-.channel-icon.messenger{background:#0084ff}
-.channel-icon.instagram{background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4)}
-.channel-icon.telegram{background:#26a5e4}
+:root{--ch-whatsapp:#25d366;--ch-messenger:#0084ff;--ch-instagram:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4);--ch-telegram:#26a5e4;--ch-linkedin:#0a66c2;--ch-tiktok:#000;--ch-sms:#ff7a00}
+.channel-icon.whatsapp{background:var(--ch-whatsapp)}
+.channel-icon.messenger{background:var(--ch-messenger)}
+.channel-icon.instagram{background:var(--ch-instagram)}
+.channel-icon.telegram{background:var(--ch-telegram)}
+.channel-icon.linkedin{background:var(--ch-linkedin)}
+.channel-icon.tiktok{background:var(--ch-tiktok)}
+.channel-icon.sms{background:var(--ch-sms)}
+.channel-badge{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;border:2px solid var(--surface);flex-shrink:0}
+.channel-badge svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2.4}
+.channel-badge.whatsapp{background:var(--ch-whatsapp)}
+.channel-badge.messenger{background:var(--ch-messenger)}
+.channel-badge.instagram{background:var(--ch-instagram)}
+.channel-badge.telegram{background:var(--ch-telegram)}
+.channel-badge.linkedin{background:var(--ch-linkedin)}
+.channel-badge.tiktok{background:var(--ch-tiktok)}
+.channel-badge.sms{background:var(--ch-sms)}
+.avatar-wrap{position:relative;display:inline-flex;flex-shrink:0}
+.avatar-wrap .channel-badge{position:absolute;right:-2px;bottom:-2px}
+.channel-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font:700 11.5px/1 var(--font-body);color:#fff}
+.channel-chip svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2}
+.channel-chip.whatsapp{background:var(--ch-whatsapp)}
+.channel-chip.messenger{background:var(--ch-messenger)}
+.channel-chip.instagram{background:var(--ch-instagram)}
+.channel-chip.telegram{background:var(--ch-telegram)}
+.channel-chip.linkedin{background:var(--ch-linkedin)}
+.channel-chip.tiktok{background:var(--ch-tiktok)}
+.channel-chip.sms{background:var(--ch-sms)}
+.chat-context-channels{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .channel-icon.zoho{background:#e42527}
 .channel-icon.hubspot{background:#ff7a59}
 .channel-copy{display:flex;flex-direction:column;gap:2px}
