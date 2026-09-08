@@ -238,7 +238,7 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .channel-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:16px}
 .channel-icon{width:38px;height:38px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
 .channel-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
-:root{--ch-whatsapp:#25d366;--ch-messenger:#0084ff;--ch-instagram:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4);--ch-telegram:#26a5e4;--ch-linkedin:#0a66c2;--ch-tiktok:#000;--ch-sms:#ff7a00}
+:root{--ch-whatsapp:#25d366;--ch-messenger:#0084ff;--ch-instagram:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4);--ch-telegram:#26a5e4;--ch-linkedin:#0a66c2;--ch-tiktok:#000;--ch-sms:#ff7a00;--ch-wordpress:#21759b}
 .channel-icon.whatsapp{background:var(--ch-whatsapp)}
 .channel-icon.messenger{background:var(--ch-messenger)}
 .channel-icon.instagram{background:var(--ch-instagram)}
@@ -246,6 +246,7 @@ body.sidebar-collapsed .nav-group-label{display:none}
 .channel-icon.linkedin{background:var(--ch-linkedin)}
 .channel-icon.tiktok{background:var(--ch-tiktok)}
 .channel-icon.sms{background:var(--ch-sms)}
+.channel-icon.wordpress{background:var(--ch-wordpress)}
 .channel-badge{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;border:2px solid var(--surface);flex-shrink:0}
 .channel-badge svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2.4}
 .channel-badge.whatsapp{background:var(--ch-whatsapp)}
@@ -849,25 +850,17 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
               <span class="pill neutral">No conectado</span>
               <button class="btn secondary" type="button" data-open-modal="#sms-modal">Conectar</button>
             </div>
+            <div class="channel-card">
+              <span class="channel-icon wordpress"><svg viewBox="0 0 24 24"><path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+              <div class="channel-copy"><strong>WordPress</strong><span>Widget de chat con plugin propio</span></div>
+              <span class="pill success">Conectado</span>
+              <button class="btn secondary" type="button" data-open-modal="#wordpress-modal">Configurar</button>
+            </div>
           </div>
         </section>
       </div>
 
       <div class="hidden" data-tab-panel="integraciones">
-        <section class="settings-section" data-tabs><h2>WordPress</h2><nav class="tabs wrap"><button class="tab active" data-tab="api">Claves API</button><button class="tab" data-tab="identity">Identidad del Bot</button><button class="tab" data-tab="theme">Tema y Colores</button><button class="tab" data-tab="layout">Diseño y Layout</button><button class="tab" data-tab="header">Encabezado</button><button class="tab" data-tab="messages">Mensajes</button><button class="tab" data-tab="welcome">Botones de Bienvenida</button></nav><div data-tab-panel="api"><div class="form-grid"><div class="field">
-  <span>Clave API WordPress</span>
-  <div class="secret-input-wrap">
-    <input class="input" type="password" placeholder="Genera una clave API en WordPress segura" id="wp-api-key" data-secret-input>
-    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-  </div>
-</div><div class="field">
-  <span>Clave Secreta WordPress</span>
-  <div class="secret-input-wrap">
-    <input class="input" type="password" placeholder="Genera una clave secreta para WordPress" id="wp-api-secret" data-secret-input>
-    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-  </div>
-</div></div><div class="header-actions top-space"><button class="btn secondary" type="button" data-generate="wp-api-key" data-toast="Clave API generada" data-toast-type="success">Generar Clave API</button><button class="btn secondary" type="button" data-generate="wp-api-secret" data-toast="Clave secreta generada" data-toast-type="success">Generar Clave Secreta</button></div></div><div class="hidden" data-tab-panel="identity"><div class="form-grid"><label class="field"><span>Nombre del bot</span><input class="input" ></label><label class="field"><span>Color primario</span><input class="input" type="color" value="#0066ff"></label></div></div></section>
-
         <section class="settings-section"><h2>99envíos</h2><p class="muted-p">Configura la autenticación y los valores base del negocio para las cotizaciones desacopladas del chatbot.</p><div class="form-grid"><label class="field"><span>URL base 99envíos</span><input class="input" placeholder="https://integration1.99envios.app"></label><label class="field"><span>Timeout 99envíos (segundos)</span><input class="input" placeholder="15"></label><label class="field"><span>Email 99envíos</span><input class="input" placeholder="usuario@ejemplo.com"></label><div class="field">
   <span>Password 99envíos</span>
   <div class="secret-input-wrap">
@@ -1023,6 +1016,25 @@ body.sidebar-collapsed .tenant-card{justify-content:center;padding:8px}
     <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
 </div></div><div class="header-actions top-space"><button class="btn secondary" type="button" data-generate="wa-hub-token" data-toast="Token del Hub generado" data-toast-type="success">Generar token Hub</button><button class="btn primary" type="button" data-toast="WhatsApp actualizado" data-toast-type="success" data-close-modal>Guardar</button></div></div>
+    </div>
+  </div>
+  
+  <div class="modal-layer" id="wordpress-modal" aria-hidden="true">
+    <div class="modal-card wide">
+      <header class="modal-header"><h2>Configurar WordPress</h2><button type="button" class="modal-close" data-close-modal>×</button></header>
+      <div class="modal-body"><div data-tabs><nav class="tabs wrap"><button class="tab active" data-tab="api">Claves API</button><button class="tab" data-tab="identity">Identidad del Bot</button><button class="tab" data-tab="theme">Tema y Colores</button><button class="tab" data-tab="layout">Diseño y Layout</button><button class="tab" data-tab="header">Encabezado</button><button class="tab" data-tab="messages">Mensajes</button><button class="tab" data-tab="welcome">Botones de Bienvenida</button></nav><div data-tab-panel="api"><div class="form-grid"><div class="field">
+  <span>Clave API WordPress</span>
+  <div class="secret-input-wrap">
+    <input class="input" type="password" placeholder="Genera una clave API en WordPress segura" id="wp-api-key" data-secret-input>
+    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</div><div class="field">
+  <span>Clave Secreta WordPress</span>
+  <div class="secret-input-wrap">
+    <input class="input" type="password" placeholder="Genera una clave secreta para WordPress" id="wp-api-secret" data-secret-input>
+    <button type="button" class="secret-toggle" data-secret-toggle title="Mostrar" aria-label="Mostrar"><svg viewBox="0 0 24 24"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</div></div><div class="header-actions top-space"><button class="btn secondary" type="button" data-generate="wp-api-key" data-toast="Clave API generada" data-toast-type="success">Generar Clave API</button><button class="btn secondary" type="button" data-generate="wp-api-secret" data-toast="Clave secreta generada" data-toast-type="success">Generar Clave Secreta</button></div></div><div class="hidden" data-tab-panel="identity"><div class="form-grid"><label class="field"><span>Nombre del bot</span><input class="input" ></label><label class="field"><span>Color primario</span><input class="input" type="color" value="#0066ff"></label></div></div></div></div>
     </div>
   </div>
   
